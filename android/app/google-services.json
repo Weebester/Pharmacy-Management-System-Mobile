@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "212280973944",
+    "project_id": "pharmacy-management-b244e",
+    "storage_bucket": "pharmacy-management-b244e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:212280973944:android:fcc360e3407a39d431eb8d",
+        "android_client_info": {
+          "package_name": "com.example.mypharmacy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5rXvFpk6SC3FzPWPLx443CwnagZNSIqY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
