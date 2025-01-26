@@ -1,19 +1,26 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mypharmacy/entry_Screen.dart';
+import 'package:mypharmacy/firebase_options.dart';
 import 'package:mypharmacy/home_Screen.dart';
 import 'package:provider/provider.dart';
 import 'api_call_manager.dart';
 import 'branch_select_screen.dart';
 import 'state_manager.dart';
 
-void main() {
-  runApp( MultiProvider(
-    providers: [
-      ChangeNotifierProvider(create: (context) => StateManager()),
-      Provider(create: (context) => APICaller(Provider.of<StateManager>(context, listen: false))),
-    ],
-    child: MyApp(),
-  ),
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => StateManager()),
+        Provider(
+            create: (context) =>
+                APICaller(Provider.of<StateManager>(context, listen: false))),
+      ],
+      child: MyApp(),
+    ),
   );
 }
 
