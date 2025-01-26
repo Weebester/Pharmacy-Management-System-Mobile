@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -51,13 +52,18 @@ class StateManager with ChangeNotifier {
     }
   }
 
+  final FirebaseAuth FBauth = FirebaseAuth.instance;
+
   Future<void> login(String email, String password) async {
     final url = '$serverAddress/Login';
 
     try {
+      UserCredential userCredential = await FBauth.signInWithEmailAndPassword(
+          email: email, password: password);
+
       final response = await http.post(
         Uri.parse(url),
-        body: jsonEncode({'email': email, 'password': password}),
+        body: jsonEncode({'FB_id': userCredential.user!.uid}),
         headers: {'Content-Type': 'application/json'},
       );
 
