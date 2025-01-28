@@ -9,7 +9,6 @@ import 'api_call_manager.dart';
 class StateManager with ChangeNotifier {
   static const int loggedOut = 0;
   static const int homeScreen = 1;
-  static const int branchSelect = 2;
 
   int _state = loggedOut;
   String _accessToken = '';
@@ -71,13 +70,7 @@ class StateManager with ChangeNotifier {
         final data = jsonDecode(response.body);
         _accessToken = data['Token'];
         _refreshToken = data['RefreshToken'];
-        if (decodeToken()["user_position"] == "manager") {
-          _state = branchSelect;
-        } else if (decodeToken()["user_position"] == "assistant") {
-          _state = homeScreen;
-        } else {
-          throw Exception('unprivileged Access');
-        }
+        _state = homeScreen;
 
         notifyListeners();
       } else {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'api_call_manager.dart';
-import 'custom_widgets.dart';
+import 'custom_widgets_&_utility.dart';
 
 class MedDetailsPage extends StatelessWidget {
   final int medId;

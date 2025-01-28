@@ -3,9 +3,10 @@ import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'state_manager.dart';
 
-
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final bool isDarkMode;
+
+  const LoginPage({super.key, required this.isDarkMode});
 
   @override
   LoginPageState createState() => LoginPageState();
@@ -33,7 +34,7 @@ class LoginPageState extends State<LoginPage> {
               children: <Widget>[
                 SizedBox(height: 80),
                 Image.asset(
-                  "Assets/LOGO.png",
+                  widget.isDarkMode ? "Assets/WLOGO.png" : "Assets/DLOGO.png",
                   height: 100,
                   width: 100,
                 ),

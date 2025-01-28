@@ -4,14 +4,14 @@ import 'package:provider/provider.dart';
 import 'api_call_manager.dart';
 import 'custom_widgets_&_utility.dart';
 
-class MedPage extends StatefulWidget {
-  const MedPage({super.key});
+class ItemPage extends StatefulWidget {
+  const ItemPage({super.key});
 
   @override
-  MedListState createState() => MedListState();
+  ItemListState createState() => ItemListState();
 }
 
-class MedListState extends State<MedPage> {
+class ItemListState extends State<ItemPage> {
   static const int pageSize = 10;
   final PagingController<int, Widget> pageCont =
       PagingController(firstPageKey: 0);
@@ -20,7 +20,7 @@ class MedListState extends State<MedPage> {
   String manufacturer = "";
   String country = "";
   String ta = "";
-  late List<Med> items = [];
+  late List<StockItem> items = [];
 
   @override
   void initState() {
@@ -28,24 +28,25 @@ class MedListState extends State<MedPage> {
     pageCont.addPageRequestListener((pageKey) {
       loadPage(pageKey);
     });
-    fetchMed().then((meds) {
+    fetchItem().then((meds) {
       items = meds;
       pageCont.refresh();
     });
   }
 
   void loadPage(int pageKey) async {
-    final cursor = items.isEmpty ? 0 : items.last.id;
+    final cursor = items.isEmpty ? "000000000000000000000000" : items.last.id;
 
     try {
-      items = await fetchMed(cursor: cursor); // pass cursor for the next page
+      items = await fetchItem(cursor: cursor); // pass cursor for the next page
       final isLastPage = items.length < pageSize;
 
       if (isLastPage) {
-        pageCont.appendLastPage(items.map((med) => MedView(med: med)).toList());
+        pageCont
+            .appendLastPage(items.map((med) => ItemView(item: med)).toList());
       } else {
         pageCont.appendPage(
-            items.map((med) => MedView(med: med)).toList(), pageKey + 1);
+            items.map((med) => ItemView(item: med)).toList(), pageKey + 1);
       }
     } catch (e) {
       pageCont.error = e;
@@ -95,9 +96,11 @@ class MedListState extends State<MedPage> {
     super.dispose();
   }
 
-  Future<List<Med>> fetchMed({int cursor = 0, int limit = pageSize}) async {
+  Future<List<StockItem>> fetchItem(
+      {String cursor = "000000000000000000000000",
+      int limit = pageSize}) async {
     String route =
-        "$serverAddress/MedList?med=$med&manufacturer=$manufacturer&country=$country&ta=$ta&cursor=$cursor&limit=$limit";
+        "$serverAddress/Stock?med=$med&manufacturer=$manufacturer&country=$country&ta=$ta&cursor=$cursor&limit=$limit";
 
     try {
       final apiCaller = context.read<APICaller>();
@@ -106,7 +109,7 @@ class MedListState extends State<MedPage> {
       if (response.statusCode == 200) {
         List<dynamic> jsonResponse = response.data;
         return jsonResponse
-            .map((jsonObject) => Med.fromJson(jsonObject))
+            .map((jsonObject) => StockItem.fromJson(jsonObject))
             .toList();
       } else {
         throw Exception('Failed to load data');
@@ -117,4 +120,3 @@ class MedListState extends State<MedPage> {
     }
   }
 }
-

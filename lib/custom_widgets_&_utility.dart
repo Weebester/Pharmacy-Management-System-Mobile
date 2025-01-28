@@ -1,7 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:mypharmacy/api_call_manager.dart';
 import 'med_details_page.dart';
-import 'med_list_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class ThemePreferences {
+  static const String _key = "theme_mode";
+
+  Future<void> saveTheme(bool isDarkMode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_key, isDarkMode);
+  }
+
+  Future<bool> loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_key) ?? false;
+  }
+}
+
+///////////////////////////////////////////////////////////MedView/////////////////////////////////////////////////////////////
 
 class MedView extends StatelessWidget {
   const MedView({super.key, required this.med});
@@ -43,6 +59,12 @@ class MedView extends StatelessWidget {
                     child: Image.network(
                       "$serverAddress/MedIMG?ImageId=${med.id}",
                       fit: BoxFit.fill,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          "Assets/placeholder.png", // Path to fallback image
+                          fit: BoxFit.fill,
+                        );
+                      },
                     ),
                   ),
                   Expanded(
@@ -85,6 +107,34 @@ class MedView extends StatelessWidget {
           ),
         ),
     ]);
+  }
+}
+
+class Med {
+  int id;
+  String med;
+  String manufacturer;
+  String country;
+  String pom;
+  String brand;
+
+  Med(
+      {required this.id,
+      required this.med,
+      required this.manufacturer,
+      required this.country,
+      required this.pom,
+      required this.brand});
+
+  factory Med.fromJson(Map<String, dynamic> json) {
+    return Med(
+      id: json["MED_id"],
+      med: json["Med"],
+      brand: json["Brand"],
+      pom: json["POM"],
+      manufacturer: json["Manufacturer"],
+      country: json["Country"],
+    );
   }
 }
 
@@ -142,6 +192,8 @@ void search(
         );
       });
 }
+
+///////////////////////////////////////////////////////////TADetails/////////////////////////////////////////////////////////////
 
 Future<TADetails?> fetchTADetails(int ta_id, APICaller apiCaller) async {
   String route = "$serverAddress/TADetails?ta_id=$ta_id";
@@ -258,5 +310,117 @@ class TADetails {
       fc: List<String>.from(json["FC"]),
       ddi: List<String>.from(json["DDI"]),
     );
+  }
+}
+
+///////////////////////////////////////////////////////////ItemView/////////////////////////////////////////////////////////////
+
+class ItemView extends StatelessWidget {
+  const ItemView({super.key, required this.item});
+
+  final StockItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MedDetailsPage(medId: item.refId),
+            ),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(2),
+          child: Card(
+            elevation: 10,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    height: 120,
+                    width: 120,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                          color: (item.pom == "Yes")
+                              ? Colors.pink
+                              : Colors.greenAccent,
+                          width: 4),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Image.network(
+                      "$serverAddress/MedIMG?ImageId=${item.refId}",
+                      fit: BoxFit.fill,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          "Assets/placeholder.png", // Path to fallback image
+                          fit: BoxFit.fill,
+                        );
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(item.med,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center),
+                        Text(
+                          "\u{1F3ED}: ${item.manufacturer}",
+                          textAlign: TextAlign.center,
+                        ),
+                        Text(
+                          "\u{1F30D}: ${item.country}",
+                          textAlign: TextAlign.center,
+                        ),
+                        Text(
+                          "\u{1FA99}: ${item.price}",
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    ]);
+  }
+}
+
+class StockItem {
+  String id;
+  int refId;
+  String med;
+  String manufacturer;
+  String country;
+  String pom;
+  int price;
+
+  StockItem(
+      {required this.id,
+      required this.refId,
+      required this.med,
+      required this.manufacturer,
+      required this.country,
+      required this.pom,
+      required this.price});
+
+  factory StockItem.fromJson(Map<String, dynamic> json) {
+    return StockItem(
+        id: json["id"],
+        refId: json["ref_id"],
+        med: json["med"],
+        manufacturer: json["manufacturer"],
+        country: json["country"],
+        pom: json["pom"],
+        price: json["price"]);
   }
 }

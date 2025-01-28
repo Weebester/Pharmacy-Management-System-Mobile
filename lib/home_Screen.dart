@@ -1,21 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:mypharmacy/item_list_page.dart';
 import 'package:mypharmacy/profile_page.dart';
 import 'package:provider/provider.dart';
 import 'state_manager.dart';
 import 'med_list_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final VoidCallback onToggleTheme;
+
+  const HomePage({super.key, required this.onToggleTheme});
 
   @override
   HomePageState createState() => HomePageState();
 }
 
 class HomePageState extends State<HomePage> {
-  int _selectedIndex = 0; // Initial index, starts at the ProfilePage
+  int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   final List<Widget> _pages = [
     ProfilePage(),
     MedPage(),
+    ItemPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -29,27 +39,57 @@ class HomePageState extends State<HomePage> {
     final authProvider = Provider.of<StateManager>(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 5,
-        title: Row(
-          children: [
-            Image.asset(
-              "Assets/LOGO.png",
-              height: 40,
+        title: Text("Home"),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            SizedBox(
+              height: 120,
+              child: DrawerHeader(
+                child: Row(
+                  children: [
+                    Icon(Icons.settings),
+                  SizedBox(width:10),
+                    Text(
+                      'Options Menu ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            SizedBox(width: 10),
-            Text("MyPharmacy")
+            ListTile(
+              leading: Icon(Icons.question_mark),
+              title: Text('Help'),
+              onTap: () {
+                // Handle Home action
+              },
+            ),
+            ListTile(
+                leading: Icon(Icons.dark_mode),
+                title: Text('ToggleDarkMode'),
+                onTap: widget.onToggleTheme),
+            ListTile(
+              leading: Icon(Icons.key),
+              title: Text('ChangePassword'),
+              onTap: () {
+                // Handle Settings action
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text('Logout'),
+              onTap: authProvider.logout,
+            ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: authProvider.logout,
-            tooltip: "Log Out",
-          ),
-        ],
       ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 500),
@@ -74,7 +114,11 @@ class HomePageState extends State<HomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.menu_book_sharp),
-            label: 'Medicine\nDictionary',
+            label: 'Dictionary',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inventory_2_outlined),
+            label: 'Stock',
           ),
         ],
       ),

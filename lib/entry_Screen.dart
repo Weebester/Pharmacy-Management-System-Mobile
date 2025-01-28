@@ -3,18 +3,28 @@ import 'package:mypharmacy/signup_page.dart';
 import 'login_page.dart';
 
 class EntryPage extends StatefulWidget {
-  const EntryPage({super.key});
+  final bool isDarkMode;
+
+  const EntryPage({super.key, required this.isDarkMode});
 
   @override
   EntryPageState createState() => EntryPageState();
 }
 
 class EntryPageState extends State<EntryPage> {
-  int _selectedIndex = 0; // Initial index, starts at the ProfilePage
-  final List<Widget> _pages = [
-    LoginPage(),
-    SignupPage(),
-  ];
+  late bool isDarkMode;
+  int _selectedIndex = 0;
+  late List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    isDarkMode = widget.isDarkMode;
+    _pages = [
+      LoginPage(isDarkMode: isDarkMode),
+      SignupPage(isDarkMode: isDarkMode),
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -24,23 +34,8 @@ class EntryPageState extends State<EntryPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 5,
-        title: Row(
-          children: [
-            Image.asset(
-              "Assets/LOGO.png",
-              height: 40,
-            ),
-            SizedBox(width: 10),
-            Text("MyPharmacy")
-          ],
-        ),
-      ),
+      appBar: AppBar(elevation: 5, title: Text("Login")),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 500),
         transitionBuilder: (Widget child, Animation<double> animation) {

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'state_manager.dart';
 
-
 class SignupPage extends StatefulWidget {
-  const SignupPage({super.key});
+  final bool isDarkMode;
+
+  const SignupPage({super.key, required this.isDarkMode});
 
   @override
   SignupPageState createState() => SignupPageState();
@@ -34,7 +35,7 @@ class SignupPageState extends State<SignupPage> {
               children: <Widget>[
                 SizedBox(height: 50),
                 Image.asset(
-                  "Assets/LOGO.png",
+                  widget.isDarkMode ? "Assets/WLOGO.png" : "Assets/DLOGO.png",
                   height: 60,
                   width: 60,
                 ),
