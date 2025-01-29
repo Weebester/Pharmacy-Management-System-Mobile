@@ -13,7 +13,6 @@ class StateManager with ChangeNotifier {
   int _state = loggedOut;
   String _accessToken = '';
   String _refreshToken = '';
-  int _pharmacyIndex = 0;
 
   // Getters
   String get refreshToken => _refreshToken;
@@ -22,7 +21,6 @@ class StateManager with ChangeNotifier {
 
   int get state => _state;
 
-  int get pharmacyIndex => _pharmacyIndex;
 
   Future<void> refreshAccessToken() async {
     final url = '$serverAddress/Refresh';
@@ -92,4 +90,5 @@ class StateManager with ChangeNotifier {
     Map<String, dynamic> decoded = JwtDecoder.decode(_accessToken);
     return decoded;
   }
+
 }

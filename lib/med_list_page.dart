@@ -13,6 +13,7 @@ class MedPage extends StatefulWidget {
 
 class MedListState extends State<MedPage> {
   static const int pageSize = 10;
+  int cursor =0;
   final PagingController<int, Widget> pageCont =
       PagingController(firstPageKey: 0);
 
@@ -20,7 +21,7 @@ class MedListState extends State<MedPage> {
   String manufacturer = "";
   String country = "";
   String ta = "";
-  late List<Med> items = [];
+  late List<Med> items;
 
   @override
   void initState() {
@@ -28,15 +29,9 @@ class MedListState extends State<MedPage> {
     pageCont.addPageRequestListener((pageKey) {
       loadPage(pageKey);
     });
-    fetchMed().then((meds) {
-      items = meds;
-      pageCont.refresh();
-    });
   }
 
   void loadPage(int pageKey) async {
-    final cursor = items.isEmpty ? 0 : items.last.id;
-
     try {
       items = await fetchMed(cursor: cursor); // pass cursor for the next page
       final isLastPage = items.length < pageSize;
@@ -47,6 +42,7 @@ class MedListState extends State<MedPage> {
         pageCont.appendPage(
             items.map((med) => MedView(med: med)).toList(), pageKey + 1);
       }
+      cursor=items.last.id;
     } catch (e) {
       pageCont.error = e;
     }
@@ -59,7 +55,7 @@ class MedListState extends State<MedPage> {
       manufacturer = newManufacturer;
       country = newCountry;
       ta = newTa;
-      items = [];
+      cursor = 0;
     });
     pageCont.refresh();
   }

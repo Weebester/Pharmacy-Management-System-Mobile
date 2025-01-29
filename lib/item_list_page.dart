@@ -8,10 +8,12 @@ class ItemPage extends StatefulWidget {
   const ItemPage({super.key});
 
   @override
-  ItemListState createState() => ItemListState();
+  ItemPageState createState() => ItemPageState();
 }
 
-class ItemListState extends State<ItemPage> {
+class ItemPageState extends State<ItemPage> {
+  int pharmaIndex = 0;
+  String cursor =  "000000000000000000000000";
   static const int pageSize = 10;
   final PagingController<int, Widget> pageCont =
       PagingController(firstPageKey: 0);
@@ -20,7 +22,14 @@ class ItemListState extends State<ItemPage> {
   String manufacturer = "";
   String country = "";
   String ta = "";
-  late List<StockItem> items = [];
+  late List<StockItem> items ;
+
+  void changeStock(int newIndex) {
+    setState(() {
+      pharmaIndex = newIndex;
+    });
+    pageCont.refresh();
+  }
 
   @override
   void initState() {
@@ -28,15 +37,9 @@ class ItemListState extends State<ItemPage> {
     pageCont.addPageRequestListener((pageKey) {
       loadPage(pageKey);
     });
-    fetchItem().then((meds) {
-      items = meds;
-      pageCont.refresh();
-    });
   }
 
   void loadPage(int pageKey) async {
-    final cursor = items.isEmpty ? "000000000000000000000000" : items.last.id;
-
     try {
       items = await fetchItem(cursor: cursor); // pass cursor for the next page
       final isLastPage = items.length < pageSize;
@@ -48,6 +51,7 @@ class ItemListState extends State<ItemPage> {
         pageCont.appendPage(
             items.map((med) => ItemView(item: med)).toList(), pageKey + 1);
       }
+      cursor = items.last.id;
     } catch (e) {
       pageCont.error = e;
     }
@@ -60,7 +64,7 @@ class ItemListState extends State<ItemPage> {
       manufacturer = newManufacturer;
       country = newCountry;
       ta = newTa;
-      items = [];
+      cursor =  "000000000000000000000000";
     });
     pageCont.refresh();
   }
@@ -100,7 +104,7 @@ class ItemListState extends State<ItemPage> {
       {String cursor = "000000000000000000000000",
       int limit = pageSize}) async {
     String route =
-        "$serverAddress/Stock?med=$med&manufacturer=$manufacturer&country=$country&ta=$ta&cursor=$cursor&limit=$limit";
+        "$serverAddress/Stock?pharma_index=$pharmaIndex&med=$med&manufacturer=$manufacturer&country=$country&ta=$ta&cursor=$cursor&limit=$limit";
 
     try {
       final apiCaller = context.read<APICaller>();

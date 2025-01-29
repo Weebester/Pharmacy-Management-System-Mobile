@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mypharmacy/item_list_page.dart';
 import 'package:mypharmacy/profile_page.dart';
 import 'package:provider/provider.dart';
+import 'api_call_manager.dart';
 import 'state_manager.dart';
 import 'med_list_page.dart';
 
@@ -15,23 +16,44 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+  final GlobalKey<ProfilePageState> profileKey = GlobalKey();
+  final GlobalKey<MedListState> dicKey = GlobalKey();
+  final GlobalKey<ItemPageState> stockKey = GlobalKey();
   int _selectedIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  final List<Widget> _pages = [
-    ProfilePage(),
-    MedPage(),
-    ItemPage(),
-  ];
+  late List<Widget> _pages;
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  Future<List> fetchBranches() async {
+    String route = "$serverAddress/branches";
+
+    try {
+      final apiCaller = context.read<APICaller>();
+      final response = await apiCaller.get(route);
+
+      if (response.statusCode == 200) {
+        return response.data; // Return the list of branches
+      } else {
+        throw Exception('Failed to load branches');
+      }
+    } catch (e) {
+      print('Error: $e');
+      return [];
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      ProfilePage(key: profileKey),
+      MedPage(),
+      ItemPage(key: stockKey),
+    ]; // Initialize the Future for fetching options
   }
 
   @override
@@ -53,7 +75,7 @@ class HomePageState extends State<HomePage> {
                 child: Row(
                   children: [
                     Icon(Icons.settings),
-                  SizedBox(width:10),
+                    SizedBox(width: 10),
                     Text(
                       'Options Menu ',
                       style: TextStyle(
@@ -73,9 +95,10 @@ class HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-                leading: Icon(Icons.dark_mode),
-                title: Text('ToggleDarkMode'),
-                onTap: widget.onToggleTheme),
+              leading: Icon(Icons.dark_mode),
+              title: Text('ToggleDarkMode'),
+              onTap: widget.onToggleTheme,
+            ),
             ListTile(
               leading: Icon(Icons.key),
               title: Text('ChangePassword'),
@@ -88,6 +111,34 @@ class HomePageState extends State<HomePage> {
               title: Text('Logout'),
               onTap: authProvider.logout,
             ),
+            if (authProvider.decodeToken()["user_position"] == "manager")
+              FutureBuilder<List>(
+                future: fetchBranches(), // Use FutureBuilder here
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator(); // Show loading state
+                  } else if (snapshot.hasError) {
+                    return ListTile(title: Text('Error fetching branches'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return ListTile(title: Text('No branches available'));
+                  } else {
+                    return ExpansionTile(
+                      title: Text("branches"),
+                      leading: Icon(Icons.list_alt),
+                      children: List.generate(snapshot.data!.length, (index) {
+                        return ListTile(
+                          title: Text(snapshot.data![index]),
+                          leading: Icon(Icons.arrow_right),
+                          onTap: () {
+                            profileKey.currentState?.updateProfile(index);
+                            stockKey.currentState?.changeStock(index);
+                          },
+                        );
+                      }),
+                    );
+                  }
+                },
+              ),
           ],
         ),
       ),
@@ -95,10 +146,9 @@ class HomePageState extends State<HomePage> {
         duration: const Duration(milliseconds: 500),
         transitionBuilder: (Widget child, Animation<double> animation) {
           return SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(1.0, 0.0), // Start from the right
-              end: Offset.zero, // End at the current position
-            ).animate(animation),
+            position:
+                Tween<Offset>(begin: const Offset(1.0, 0.0), end: Offset.zero)
+                    .animate(animation),
             child: child,
           );
         },

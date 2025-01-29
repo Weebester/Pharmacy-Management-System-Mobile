@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mypharmacy/state_manager.dart';
 import 'package:provider/provider.dart';
 import 'api_call_manager.dart';
 
@@ -11,6 +10,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class ProfilePageState extends State<ProfilePage> {
+  int pharmaIndex = 0;
   Profile profile = Profile(userName: " ", pharmacy: " ", position: " ");
 
   Future<Profile> fetchProfile(int pharmaIndex) async {
@@ -45,11 +45,19 @@ class ProfilePageState extends State<ProfilePage> {
     });
   }
 
+  void updateProfile(int newIndex) {
+    fetchProfile(newIndex).then((result) {
+      setState(() {
+        pharmaIndex = newIndex;
+        profile = result;
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    final userState = context.read<StateManager>();
-    fetchProfile(userState.pharmacyIndex).then((result) {
+    fetchProfile(pharmaIndex).then((result) {
       setState(() {
         profile = result;
       });
