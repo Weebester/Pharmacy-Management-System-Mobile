@@ -6,7 +6,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 
 import 'api_call_manager.dart';
 
-class StateManager with ChangeNotifier {
+class UserState with ChangeNotifier {
   static const int loggedOut = 0;
   static const int homeScreen = 1;
 

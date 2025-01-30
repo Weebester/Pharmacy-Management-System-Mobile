@@ -58,7 +58,7 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<StateManager>(context);
+    final authProvider = Provider.of<UserState>(context);
 
     return Scaffold(
       appBar: AppBar(

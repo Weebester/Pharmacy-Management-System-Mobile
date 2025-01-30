@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mypharmacy/api_call_manager.dart';
+import 'Item_details_page.dart';
 import 'med_details_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -328,7 +329,7 @@ class ItemView extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => MedDetailsPage(medId: item.refId),
+              builder: (context) => ItemDetailsPage(itemId: item.id),
             ),
           );
         },

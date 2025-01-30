@@ -15,10 +15,10 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => StateManager()),
+        ChangeNotifierProvider(create: (context) => UserState()),
         Provider(
             create: (context) =>
-                APICaller(Provider.of<StateManager>(context, listen: false))),
+                APICaller(Provider.of<UserState>(context, listen: false))),
       ],
       child: MyApp(
         isDarkMode: isDarkMode,
@@ -54,12 +54,12 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<StateManager>(
-      builder: (context, stateManager, _) {
+    return Consumer<UserState>(
+      builder: (context, userState, _) {
         return MaterialApp(
             title: 'Flutter Demo',
             theme: isDarkMode ? ThemeData.dark() : ThemeData.light(),
-            home: switch (stateManager.state) {
+            home: switch (userState.state) {
               1 => HomePage(onToggleTheme: toggleTheme),
               _ => EntryPage(isDarkMode: isDarkMode)
             });

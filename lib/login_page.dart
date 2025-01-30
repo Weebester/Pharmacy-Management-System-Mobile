@@ -21,7 +21,7 @@ class LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     // Access the stateProvider
-    final userState = Provider.of<StateManager>(context);
+    final userState = Provider.of<UserState>(context);
 
     return SafeArea(
       child: SingleChildScrollView(

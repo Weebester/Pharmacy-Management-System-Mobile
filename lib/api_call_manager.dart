@@ -5,7 +5,7 @@ const String serverAddress = "http://192.168.0.105:8000";
 
 class APICaller {
   final Dio _dio;
-  final StateManager _stateManager;
+  final UserState _stateManager;
 
   APICaller(this._stateManager) : _dio = Dio() {
     _dio.interceptors.add(
