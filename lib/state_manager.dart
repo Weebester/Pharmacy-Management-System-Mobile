@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -9,6 +10,8 @@ import 'api_call_manager.dart';
 class UserState with ChangeNotifier {
   static const int loggedOut = 0;
   static const int homeScreen = 1;
+  final FirebaseAuth FBauth = FirebaseAuth.instance;
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   int _state = loggedOut;
   String _accessToken = '';
@@ -16,40 +19,23 @@ class UserState with ChangeNotifier {
 
   // Getters
   String get refreshToken => _refreshToken;
-
   String get accessToken => _accessToken;
-
   int get state => _state;
 
+  // Initialize user from stored tokens
+  Future<void> initializeUser() async {
+    _accessToken = await _storage.read(key: 'accessToken') ?? '';
+    _refreshToken = await _storage.read(key: 'refreshToken') ?? '';
 
-  Future<void> refreshAccessToken() async {
-    final url = '$serverAddress/Refresh';
-
-    try {
-      if (refreshToken.isEmpty) throw Exception("No refresh token available");
-
-      // Simulated API call
-      final response = await http.post(
-        Uri.parse(url),
-        body: jsonEncode({"refreshToken": refreshToken}),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        _accessToken = data['newAccessToken'];
-
-        notifyListeners();
+    if (_accessToken.isNotEmpty) {
+      if (JwtDecoder.isExpired(_accessToken)) {
+        await refreshAccessToken();
       } else {
-        throw Exception("Failed to refresh access token: ${response.body}");
+        _state = homeScreen;
+        notifyListeners();
       }
-    } catch (e) {
-      logout();
-      rethrow;
     }
   }
-
-  final FirebaseAuth FBauth = FirebaseAuth.instance;
 
   Future<void> login(String email, String password) async {
     final url = '$serverAddress/Login';
@@ -70,6 +56,10 @@ class UserState with ChangeNotifier {
         _refreshToken = data['RefreshToken'];
         _state = homeScreen;
 
+        // Save tokens securely
+        await _storage.write(key: 'accessToken', value: _accessToken);
+        await _storage.write(key: 'refreshToken', value: _refreshToken);
+
         notifyListeners();
       } else {
         throw Exception('Login failed: ${response.body}');
@@ -79,16 +69,46 @@ class UserState with ChangeNotifier {
     }
   }
 
-  void logout() {
+  Future<void> refreshAccessToken() async {
+    final url = '$serverAddress/Refresh';
+
+    try {
+      if (_refreshToken.isEmpty) throw Exception("No refresh token available");
+
+      final response = await http.post(
+        Uri.parse(url),
+        body: jsonEncode({"refreshToken": _refreshToken}),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        _accessToken = data['newAccessToken'];
+
+        // Update stored access token
+        await _storage.write(key: 'accessToken', value: _accessToken);
+        notifyListeners();
+      } else {
+        throw Exception("Failed to refresh access token: ${response.body}");
+      }
+    } catch (e) {
+      logout();
+      rethrow;
+    }
+  }
+
+  void logout() async {
     _accessToken = '';
     _refreshToken = '';
     _state = loggedOut;
+
+    // Clear stored tokens
+    await _storage.deleteAll();
+
     notifyListeners();
   }
 
   Map<String, dynamic> decodeToken() {
-    Map<String, dynamic> decoded = JwtDecoder.decode(_accessToken);
-    return decoded;
+    return JwtDecoder.decode(_accessToken);
   }
-
 }

@@ -12,10 +12,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   final bool isDarkMode = await ThemePreferences().loadTheme();
+  final userState = UserState();
+  await userState.initializeUser();
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => UserState()),
+        ChangeNotifierProvider(create: (context) => userState),
         Provider(
             create: (context) =>
                 APICaller(Provider.of<UserState>(context, listen: false))),

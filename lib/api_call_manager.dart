@@ -10,10 +10,11 @@ class APICaller {
   APICaller(this._stateManager) : _dio = Dio() {
     _dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) {
-          if (_stateManager.accessToken.isNotEmpty) {
-            options.headers['Authorization'] =
-                'Bearer ${_stateManager.accessToken}';
+        onRequest: (options, handler) async {
+          // Ensure we always use the latest access token
+          final accessToken = _stateManager.accessToken;
+          if (accessToken.isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $accessToken';
           }
           return handler.next(options);
         },
@@ -22,6 +23,8 @@ class APICaller {
             try {
               await _stateManager.refreshAccessToken();
 
+              // Retry the failed request with the new token
+              final newAccessToken = _stateManager.accessToken;
               final newRequest = await _dio.request(
                 e.requestOptions.path,
                 data: e.requestOptions.data,
@@ -29,7 +32,7 @@ class APICaller {
                 options: Options(
                   method: e.requestOptions.method,
                   headers: {
-                    'Authorization': 'Bearer ${_stateManager.accessToken}'
+                    'Authorization': 'Bearer $newAccessToken'
                   },
                 ),
               );
