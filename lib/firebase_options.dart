@@ -50,11 +50,11 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyC5rXvFpk6SC3FzPWPLx443CwnagZNSIqY',
-    appId: '1:212280973944:android:fcc360e3407a39d431eb8d',
-    messagingSenderId: '212280973944',
-    projectId: 'pharmacy-management-b244e',
-    storageBucket: 'pharmacy-management-b244e.firebasestorage.app',
+    apiKey: 'AIzaSyAfgORzgO__UhoeCDX4l-PVWlfSIDpAdvM',
+    appId: '1:489901287674:android:2c1928205bc51f168d8143',
+    messagingSenderId: '489901287674',
+    projectId: 'pharmacy-managment-6e7d4',
+    storageBucket: 'pharmacy-managment-6e7d4.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(

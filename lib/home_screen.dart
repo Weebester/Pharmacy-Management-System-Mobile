@@ -3,7 +3,7 @@ import 'package:mypharmacy/item_list_page.dart';
 import 'package:mypharmacy/profile_page.dart';
 import 'package:provider/provider.dart';
 import 'api_call_manager.dart';
-import 'state_manager.dart';
+import 'user_state.dart';
 import 'med_list_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -58,7 +58,7 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<UserState>(context);
+    final userState = Provider.of<UserState>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -96,22 +96,24 @@ class HomePageState extends State<HomePage> {
             ),
             ListTile(
               leading: Icon(Icons.dark_mode),
-              title: Text('ToggleDarkMode'),
+              title: Text('Toggle DarkMode'),
               onTap: widget.onToggleTheme,
             ),
             ListTile(
               leading: Icon(Icons.key),
-              title: Text('ChangePassword'),
+              title: Text('Change Password'),
               onTap: () {
                 // Handle Settings action
               },
             ),
             ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Logout'),
-              onTap: authProvider.logout,
+              leading: Icon(Icons.message_outlined),
+              title: Text('Submit a Ticket'),
+              onTap: () {
+                // Handle Settings action
+              },
             ),
-            if (authProvider.decodeToken()["user_position"] == "manager")
+            if (userState.decodeToken()["user_position"] == "manager")
               FutureBuilder<List>(
                 future: fetchBranches(), // Use FutureBuilder here
                 builder: (context, snapshot) {
@@ -139,6 +141,11 @@ class HomePageState extends State<HomePage> {
                   }
                 },
               ),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text('Logout'),
+              onTap: userState.logout,
+            ),
           ],
         ),
       ),

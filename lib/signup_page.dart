@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'state_manager.dart';
+import 'user_state.dart';
 
 class SignupPage extends StatefulWidget {
   final bool isDarkMode;

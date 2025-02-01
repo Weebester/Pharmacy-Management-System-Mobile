@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
-import 'state_manager.dart';
+import 'user_state.dart';
 
 class LoginPage extends StatefulWidget {
   final bool isDarkMode;
@@ -20,7 +20,7 @@ class LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Access the stateProvider
+    // Access the UserState
     final userState = Provider.of<UserState>(context);
 
     return SafeArea(

@@ -10,7 +10,7 @@ import 'api_call_manager.dart';
 class UserState with ChangeNotifier {
   static const int loggedOut = 0;
   static const int homeScreen = 1;
-  final FirebaseAuth FBauth = FirebaseAuth.instance;
+  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   int _state = loggedOut;
@@ -19,7 +19,9 @@ class UserState with ChangeNotifier {
 
   // Getters
   String get refreshToken => _refreshToken;
+
   String get accessToken => _accessToken;
+
   int get state => _state;
 
   // Initialize user from stored tokens
@@ -41,8 +43,8 @@ class UserState with ChangeNotifier {
     final url = '$serverAddress/Login';
 
     try {
-      UserCredential userCredential = await FBauth.signInWithEmailAndPassword(
-          email: email, password: password);
+      UserCredential userCredential = await firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password);
 
       final response = await http.post(
         Uri.parse(url),
@@ -62,10 +64,30 @@ class UserState with ChangeNotifier {
 
         notifyListeners();
       } else {
-        throw Exception('Login failed: ${response.body}');
+        throw Exception(
+            'Login failed: ${jsonDecode(response.body)["message"]}');
       }
-    } catch (error) {
-      rethrow;
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'invalid-email':
+          throw Exception("Invalid email format.");
+        case 'user-not-found':
+          throw Exception("No account found with this email.");
+        case 'wrong-password':
+          throw Exception("Incorrect password. Please try again.");
+        case 'user-disabled':
+          throw Exception("This account has been disabled.");
+        case 'email-already-in-use':
+          throw Exception("This email is already registered.");
+        case 'weak-password':
+          throw Exception("Weak password. Please choose a stronger one.");
+        case 'network-request-failed':
+          throw Exception("Network error. Check your internet connection.");
+        default:
+          throw Exception("Login failed. Please check your credentials.");
+      }
+    } catch (e) {
+      throw Exception("An unexpected error occurred. Please try again.");
     }
   }
 
