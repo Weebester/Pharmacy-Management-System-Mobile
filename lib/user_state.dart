@@ -39,7 +39,7 @@ class UserState with ChangeNotifier {
     }
   }
 
-  Future<void> login(String email, String password) async {
+  Future<void> login(String email, String password ,{String name="",phName=""}) async {
     final url = '$serverAddress/Login';
 
     try {
@@ -90,6 +90,63 @@ class UserState with ChangeNotifier {
       throw Exception("An unexpected error occurred. Please try again.");
     }
   }
+
+  Future<void> signUp(String name, String pharmacyName, String email, String password) async {
+    final url = '$serverAddress/sign_up';
+
+    try {
+      UserCredential userCredential;
+
+      try {
+        userCredential = await firebaseAuth.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'email-already-in-use') {
+          // If email is already in use, just sign in the user
+          userCredential = await firebaseAuth.signInWithEmailAndPassword(
+            email: email,
+            password: password,
+          );
+        } else {
+          throw Exception("Firebase authentication error: ${e.message}");
+        }
+      }
+
+      final response = await http.post(
+        Uri.parse(url),
+        body: jsonEncode({
+          'name': name,
+          'pharmacyName': pharmacyName,
+          'email': email,
+          'FB_id': userCredential.user!.uid,
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        await login(email, password); // Call login after successful sign-up
+      } else {
+        throw Exception('Sign-up failed: ${jsonDecode(response.body)["message"]}');
+      }
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'invalid-email':
+          throw Exception("Invalid email format.");
+        case 'weak-password':
+          throw Exception("Weak password. Please choose a stronger one.");
+        case 'network-request-failed':
+          throw Exception("Network error. Check your internet connection.");
+        default:
+          throw Exception("Sign-up failed. Please try again.");
+      }
+    } catch (e) {
+      throw Exception("An unexpected error occurred. Please try again. $e");
+    }
+  }
+
+
 
   Future<void> refreshAccessToken() async {
     final url = '$serverAddress/Refresh';

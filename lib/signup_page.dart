@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'user_state.dart';
 
@@ -21,7 +22,6 @@ class SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Access the stateProvider
     final userState = Provider.of<UserState>(context);
 
     return SafeArea(
@@ -118,19 +118,45 @@ class SignupPageState extends State<SignupPage> {
                 SizedBox(height: 40),
                 Center(
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState?.validate() ?? false) {
-                        // This button can be used for sign-up logic, if needed
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text('Sign-up feature coming soon!')));
+                        setState(() {
+                          _isLoading = true;
+                        });
+
+                        try {
+                          await userState.signUp(
+                            _nameController.text,
+                            _pharmacyNameController.text,
+                            _emailController.text,
+                            _passwordController.text,
+                          );
+                        } catch (error) {
+                          SchedulerBinding.instance
+                              .addPostFrameCallback((_) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Signuofaild: $error')),
+                              );
+                            }
+                          });
+                        } finally {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                        }
                       }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                     ),
-                    child: Text(
+                    child: _isLoading
+                        ? const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    )
+                        : const Text(
                       'Sign up',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                         color: Colors.white,
@@ -146,3 +172,4 @@ class SignupPageState extends State<SignupPage> {
     );
   }
 }
+

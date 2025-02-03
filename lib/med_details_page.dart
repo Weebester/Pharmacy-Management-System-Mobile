@@ -94,6 +94,26 @@ class MedDetailsPage extends StatelessWidget {
                         ],
                       ),
                       SizedBox(height: 16),
+                      Container(
+                        width: double.infinity,
+                        // Make it take almost full width
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        // Optional padding to adjust button's width
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                          ),
+                          child: Text(
+                            'ADD',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
                       Divider(),
                       Text(
                         "Basic Details",

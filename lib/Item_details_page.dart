@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import 'api_call_manager.dart';
 import 'med_details_page.dart';
 
@@ -8,7 +9,8 @@ class ItemDetailsPage extends StatelessWidget {
 
   const ItemDetailsPage({super.key, required this.itemId});
 
-  Future<ItemDetails?> fetchItemDetails(String itemId, APICaller apiCaller) async {
+  Future<ItemDetails?> fetchItemDetails(
+      String itemId, APICaller apiCaller) async {
     String route = "$serverAddress/StockItem?item_id=$itemId";
 
     try {
@@ -49,6 +51,7 @@ class ItemDetailsPage extends StatelessWidget {
 
           final itemDetails = snapshot.data!;
           DateTime now = DateTime.now();
+          DateTime FourMonths = now.add(Duration(days: 100));
 
           return Center(
             child: SingleChildScrollView(
@@ -95,12 +98,14 @@ class ItemDetailsPage extends StatelessWidget {
                                   ),
                                 ),
                                 IconButton(
-                                  icon: Icon(Icons.info_outline, color: Colors.blue),
+                                  icon: Icon(Icons.info_outline,
+                                      color: Colors.blue),
                                   onPressed: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => MedDetailsPage(medId: itemDetails.referenceId),
+                                        builder: (context) => MedDetailsPage(
+                                            medId: itemDetails.referenceId),
                                       ),
                                     );
                                   },
@@ -111,6 +116,26 @@ class ItemDetailsPage extends StatelessWidget {
                         ],
                       ),
                       SizedBox(height: 16),
+                      Container(
+                        width: double.infinity,
+                        // Make it take almost full width
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        // Optional padding to adjust button's width
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                          ),
+                          child: Text(
+                            'Remove',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
                       Divider(),
                       Text(
                         "Basic Details",
@@ -126,27 +151,64 @@ class ItemDetailsPage extends StatelessWidget {
                           style: TextStyle(fontWeight: FontWeight.bold)),
                       Text("POM: ${itemDetails.pom}",
                           style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text("Price: \$${itemDetails.priceTag}",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Row(
+                        children: [
+                          Text(
+                            "Price: ${itemDetails.priceTag} IQD",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(Icons.edit),
+                          ),
+                        ],
+                      ),
                       SizedBox(height: 16),
                       Divider(),
-                      Text(
-                        "Batches",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                      Row(
+                        children: [
+                          Text(
+                            "Batches",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(Icons.add_circle_outline),
+                          ),
+                        ],
                       ),
                       SizedBox(height: 8),
                       for (var batch in itemDetails.batches) ...[
-                        Text(
-                          "Expiry Date: ${batch.expiryDate}",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: DateTime.parse(batch.expiryDate).isBefore(now) ? Colors.red : Colors.black,
-                          ),
-                        ),
-                        Text(
-                          "Stock: ${batch.stockCounter}",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        Row(
+                          children: [
+                            Text(
+                              "ExpDate: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(batch.expiryDate))}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: DateTime.parse(batch.expiryDate)
+                                          .isBefore(now)
+                                      ? Colors.red // Expired
+                                      : DateTime.parse(batch.expiryDate)
+                                              .isBefore(FourMonths)
+                                          ? Colors.orange // 4 months to expire
+                                          : (Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors
+                                                  .white // Use white in dark mode
+                                              : Colors
+                                                  .black) // Default black color in light mode
+                                  ),
+                            ),
+                            Text(
+                              " (${batch.stockCounter})",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            IconButton(
+                              onPressed: () {},
+                              icon: Icon(Icons.delete),
+                            ),
+                          ],
                         ),
                         SizedBox(height: 16),
                       ],
