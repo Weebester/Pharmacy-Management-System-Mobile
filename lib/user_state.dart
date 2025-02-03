@@ -39,12 +39,12 @@ class UserState with ChangeNotifier {
     }
   }
 
-  Future<void> login(String email, String password ,{String name="",phName=""}) async {
+  Future<void> login(String email, String password, {String name = "", String phName = ""}) async {
     final url = '$serverAddress/Login';
+    final url2 = '$serverAddress/sign_up';
 
     try {
-      UserCredential userCredential = await firebaseAuth
-          .signInWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
 
       final response = await http.post(
         Uri.parse(url),
@@ -63,88 +63,53 @@ class UserState with ChangeNotifier {
         await _storage.write(key: 'refreshToken', value: _refreshToken);
 
         notifyListeners();
+      } else if (response.statusCode == 456) {
+        // User not found, proceed to sign up
+        final signUpResponse = await http.post(
+          Uri.parse(url2),
+          body: jsonEncode({
+            'name': name,
+            'pharmacyName': phName,
+            'email': email,
+            'FB_id': userCredential.user!.uid,
+          }),
+          headers: {'Content-Type': 'application/json'},
+        );
+
+        if (signUpResponse.statusCode == 200) {
+          // Call login again after successful sign-up
+          return login(email, password);
+        } else {
+          throw Exception('Sign-up failed: ${jsonDecode(signUpResponse.body)["message"]}');
+        }
       } else {
-        throw Exception(
-            'Login failed: ${jsonDecode(response.body)["message"]}');
+        throw Exception('Login failed: ${jsonDecode(response.body)["message"]}');
       }
     } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case 'invalid-email':
-          throw Exception("Invalid email format.");
-        case 'user-not-found':
-          throw Exception("No account found with this email.");
-        case 'wrong-password':
-          throw Exception("Incorrect password. Please try again.");
-        case 'user-disabled':
-          throw Exception("This account has been disabled.");
-        case 'email-already-in-use':
-          throw Exception("This email is already registered.");
-        case 'weak-password':
-          throw Exception("Weak password. Please choose a stronger one.");
-        case 'network-request-failed':
-          throw Exception("Network error. Check your internet connection.");
-        default:
-          throw Exception("Login failed. Please check your credentials.");
-      }
+      throw Exception(e.message);
     } catch (e) {
       throw Exception("An unexpected error occurred. Please try again.");
     }
   }
 
-  Future<void> signUp(String name, String pharmacyName, String email, String password) async {
-    final url = '$serverAddress/sign_up';
 
+
+  Future<void> signUp(String name, String phName, String email, String password) async {
     try {
-      UserCredential userCredential;
-
-      try {
-        userCredential = await firebaseAuth.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'email-already-in-use') {
-          // If email is already in use, just sign in the user
-          userCredential = await firebaseAuth.signInWithEmailAndPassword(
-            email: email,
-            password: password,
-          );
-        } else {
-          throw Exception("Firebase authentication error: ${e.message}");
-        }
-      }
-
-      final response = await http.post(
-        Uri.parse(url),
-        body: jsonEncode({
-          'name': name,
-          'pharmacyName': pharmacyName,
-          'email': email,
-          'FB_id': userCredential.user!.uid,
-        }),
-        headers: {'Content-Type': 'application/json'},
+      //create FireBase Account
+      await firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
       );
-
-      if (response.statusCode == 200) {
-        await login(email, password); // Call login after successful sign-up
-      } else {
-        throw Exception('Sign-up failed: ${jsonDecode(response.body)["message"]}');
-      }
+      //call login
+      await login(email, password,name: name,phName: phName);
     } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case 'invalid-email':
-          throw Exception("Invalid email format.");
-        case 'weak-password':
-          throw Exception("Weak password. Please choose a stronger one.");
-        case 'network-request-failed':
-          throw Exception("Network error. Check your internet connection.");
-        default:
-          throw Exception("Sign-up failed. Please try again.");
-      }
+      throw Exception(e.message);
     } catch (e) {
       throw Exception("An unexpected error occurred. Please try again. $e");
     }
   }
+
 
 
 
