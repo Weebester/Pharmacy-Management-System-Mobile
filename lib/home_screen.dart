@@ -113,7 +113,7 @@ class HomePageState extends State<HomePage> {
                 // Handle Settings action
               },
             ),
-            if (userState.decodeToken()["user_position"]?.toLowerCase() == "manager")
+            if (userState.decodeToken()["Manager"] == "Yes")
               FutureBuilder<List>(
                 future: fetchBranches(), // Use FutureBuilder here
                 builder: (context, snapshot) {

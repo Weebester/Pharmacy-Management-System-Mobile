@@ -11,7 +11,8 @@ class ProfilePage extends StatefulWidget {
 
 class ProfilePageState extends State<ProfilePage> {
   int pharmaIndex = 0;
-  Profile profile = Profile(userName: " ", pharmacy: " ", position: " ");
+  Profile profile =
+      Profile(userName: " ", pharmacy: " ", email: " ", position: " ");
 
   Future<Profile> fetchProfile(int pharmaIndex) async {
     String route = "$serverAddress/Profile?pharma_index=$pharmaIndex";
@@ -78,6 +79,9 @@ class ProfilePageState extends State<ProfilePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header Section
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child:
                 Row(
                   children: [
                     CircleAvatar(
@@ -91,21 +95,24 @@ class ProfilePageState extends State<ProfilePage> {
                         Text(
                           profile.userName,
                           style: Theme.of(context).textTheme.titleLarge,
-                          maxLines: null,
+                        ),
+                        Text(
+
+                          profile.email,
+                          style: Theme.of(context).textTheme.titleSmall,
                         ),
                         Text(
                           profile.pharmacy,
                           style: Theme.of(context).textTheme.titleMedium,
-                          maxLines: null,
                         ),
                         Text(
-                          profile.position,
+                          profile.position=="Yes"?"Manager":"Assistant",
                           style: Theme.of(context).textTheme.titleMedium,
-                          maxLines: null,
                         ),
                       ],
                     ),
                   ],
+                ),
                 ),
                 const SizedBox(height: 20),
                 const Divider(),
@@ -156,15 +163,20 @@ class InfoTile extends StatelessWidget {
 
 class Profile {
   String userName;
+  String email;
   String pharmacy;
   String position;
 
   Profile(
-      {required this.userName, required this.pharmacy, required this.position});
+      {required this.userName,
+      required this.pharmacy,
+      required this.email,
+      required this.position});
 
   factory Profile.fromJson(Map<String, dynamic> json) {
     return Profile(
       userName: json["user_name"],
+      email: json["email"],
       pharmacy: json["pharmacy"],
       position: json["position"],
     );

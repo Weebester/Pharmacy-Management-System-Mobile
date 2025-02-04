@@ -10,23 +10,23 @@ class ItemPage extends StatefulWidget {
   @override
   ItemPageState createState() => ItemPageState();
 }
-
 class ItemPageState extends State<ItemPage> {
   int pharmaIndex = 0;
-  String cursor =  "000000000000000000000000";
+  int cursor = 0;
   static const int pageSize = 10;
   final PagingController<int, Widget> pageCont =
-      PagingController(firstPageKey: 0);
+  PagingController(firstPageKey: 0);
 
   String med = "";
   String manufacturer = "";
   String country = "";
   String ta = "";
-  late List<StockItem> items ;
+  late List<StockItem> items;
 
   void changeStock(int newIndex) {
     setState(() {
       pharmaIndex = newIndex;
+      cursor=0;
     });
     pageCont.refresh();
   }
@@ -43,7 +43,6 @@ class ItemPageState extends State<ItemPage> {
     try {
       items = await fetchItem(cursor: cursor); // pass cursor for the next page
       final isLastPage = items.length < pageSize;
-
       if (isLastPage) {
         pageCont
             .appendLastPage(items.map((med) => ItemView(item: med)).toList());
@@ -51,7 +50,7 @@ class ItemPageState extends State<ItemPage> {
         pageCont.appendPage(
             items.map((med) => ItemView(item: med)).toList(), pageKey + 1);
       }
-      cursor = items.last.id;
+      cursor = items.last.itemID;
     } catch (e) {
       pageCont.error = e;
     }
@@ -64,7 +63,7 @@ class ItemPageState extends State<ItemPage> {
       manufacturer = newManufacturer;
       country = newCountry;
       ta = newTa;
-      cursor =  "000000000000000000000000";
+      cursor = 0;
     });
     pageCont.refresh();
   }
@@ -94,18 +93,11 @@ class ItemPageState extends State<ItemPage> {
     );
   }
 
-  @override
-  void dispose() {
-    pageCont.dispose();
-    super.dispose();
-  }
-
   Future<List<StockItem>> fetchItem(
-      {String cursor = "000000000000000000000000",
+      {int cursor = 0,
       int limit = pageSize}) async {
     String route =
         "$serverAddress/Stock?pharma_index=$pharmaIndex&med=$med&manufacturer=$manufacturer&country=$country&ta=$ta&cursor=$cursor&limit=$limit";
-
     try {
       final apiCaller = context.read<APICaller>();
       final response = await apiCaller.get(route);
