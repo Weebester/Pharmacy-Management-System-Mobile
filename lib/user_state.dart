@@ -14,7 +14,7 @@ class UserState with ChangeNotifier {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   int _state = loggedOut;
-  int _pharmaindex = 0;
+  int _pharmaIndex = 0;
   String _accessToken = '';
   String _refreshToken = '';
 
@@ -25,9 +25,9 @@ class UserState with ChangeNotifier {
 
   int get state => _state;
 
-  int get pharmaindex => _pharmaindex;
+  int get pharmaIndex => _pharmaIndex;
 
-  // Initialize user from stored tokens
+  // FastLogin from secure Storage
   Future<void> initializeUser() async {
     _accessToken = await _storage.read(key: 'accessToken') ?? '';
     _refreshToken = await _storage.read(key: 'refreshToken') ?? '';
@@ -63,7 +63,7 @@ class UserState with ChangeNotifier {
         _refreshToken = data['RefreshToken'];
         _state = homeScreen;
 
-        // Save tokens securely
+        // Store tokens
         await _storage.write(key: 'accessToken', value: _accessToken);
         await _storage.write(key: 'refreshToken', value: _refreshToken);
 
@@ -132,7 +132,7 @@ class UserState with ChangeNotifier {
         final data = jsonDecode(response.body);
         _accessToken = data['newAccessToken'];
 
-        // Update stored access token
+        // store tokens
         await _storage.write(key: 'accessToken', value: _accessToken);
         notifyListeners();
       } else {
@@ -149,15 +149,15 @@ class UserState with ChangeNotifier {
     _refreshToken = '';
     _state = loggedOut;
 
-    // Clear stored tokens
+    //Clear tokens
     await _storage.deleteAll();
 
     notifyListeners();
   }
 
-  void changeindex(int x) {
-    _pharmaindex = x;
-    print(x);
+  void changeIndex(int x) {
+    _pharmaIndex = x;
+    //print(x);
     notifyListeners();
   }
 

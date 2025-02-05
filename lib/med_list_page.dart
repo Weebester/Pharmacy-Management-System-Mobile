@@ -34,7 +34,7 @@ class MedListState extends State<MedPage> {
 
   void loadPage(int pageKey) async {
     try {
-      items = await fetchMed(cursor: cursor); // pass cursor for the next page
+      items = await fetchMed(cursor: cursor);
       final isLastPage = items.length < pageSize;
 
       if (isLastPage) {

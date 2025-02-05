@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:mypharmacy/Bill.dart';
 
 import 'item_details_page.dart';
 import 'api_call_manager.dart';
 
 class ItemView extends StatelessWidget {
-  const ItemView({super.key, required this.item});
+  const ItemView({super.key, required this.item, required this.bill});
 
   final StockItem item;
+  final BillState bill;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +74,13 @@ class ItemView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        bill.addItem(CartItem(
+                            id: item.itemID,
+                            name: item.med,
+                            expDate: batch["EXDate"],
+                            price: item.price));
+                      },
                       leading: const Icon(
                         Icons.monetization_on,
                         size: 30,
@@ -87,8 +95,7 @@ class ItemView extends StatelessWidget {
                       ),
                     ),
                   );
-                })
-              ,
+                }),
               Container(
                 margin: const EdgeInsets.symmetric(vertical: 5),
                 decoration: BoxDecoration(
@@ -133,7 +140,7 @@ class StockItem {
   String country;
   String pom;
   int price;
-  List<Map<String, dynamic>> batches;  // Add batches field
+  List<Map<String, dynamic>> batches;
 
   StockItem({
     required this.itemID,
@@ -143,7 +150,7 @@ class StockItem {
     required this.country,
     required this.pom,
     required this.price,
-    required this.batches,  // Update constructor
+    required this.batches,
   });
 
   factory StockItem.fromJson(Map<String, dynamic> json) {
@@ -155,7 +162,8 @@ class StockItem {
         country: json["Country"],
         pom: json["Pom"],
         price: json["Price"],
-        batches: List<Map<String, dynamic>>.from(json["batches"])  // If no batches, return empty list
-    );
+        batches: List<Map<String, dynamic>>.from(
+            json["batches"]) // If no batches,then empty list
+        );
   }
 }

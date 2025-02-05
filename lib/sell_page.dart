@@ -8,7 +8,7 @@ class SellPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<BillState>(
-      builder: (context, cartProvider, child) {
+      builder: (context, currentBill, child) {
         return Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
@@ -27,15 +27,14 @@ class SellPage extends StatelessWidget {
                     const SizedBox(height: 20),
                     const Divider(),
 
-                    // List of medicines and prices
                     Column(
-                      children: List.generate(cartProvider.cartItems.length, (index) {
-                        final item = cartProvider.cartItems[index];
+                      children: List.generate(currentBill.cartItems.length, (index) {
+                        final item = currentBill.cartItems[index];
                         return ListTile(
                           title: Text(item.name),
-                          subtitle: Text("Price: \$${item.price}"),
+                          subtitle: Text("Price:${item.price}IQD"),
                           onTap: () {
-                            cartProvider.removeItem(index); // Remove item on tap
+                            currentBill.removeItem(index);
                           },
                         );
                       }),
@@ -46,7 +45,7 @@ class SellPage extends StatelessWidget {
 
                     // Total Price Calculation
                     Text(
-                      "Total Price: \$${cartProvider.totalPrice}",
+                      "Total Price: \$${currentBill.totalPrice}",
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -59,7 +58,7 @@ class SellPage extends StatelessWidget {
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            cartProvider.clearCart(); // Clear cart on cancel
+                            currentBill.clearCart(); // Clear cart on cancel
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
@@ -75,7 +74,31 @@ class SellPage extends StatelessWidget {
                         ),
                         ElevatedButton(
                           onPressed: () {
-                            // Handle sell action
+                            showDialog(
+                              ////temp sell place holder
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Cart Items"),
+                                  content: SingleChildScrollView(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: currentBill.cartItems.map<Widget>((item) {
+                                        return Text(item.toString());
+                                      }).toList(),
+                                    ),
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text("Close"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green,

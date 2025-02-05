@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'user_state.dart';
-
 const String serverAddress = "http://192.168.0.105:8000";
 
 class APICaller {

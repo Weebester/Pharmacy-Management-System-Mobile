@@ -136,7 +136,7 @@ class SignupPageState extends State<SignupPage> {
                               .addPostFrameCallback((_) {
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Signuofaild: $error')),
+                                SnackBar(content: Text('SignUpFailed: $error')),
                               );
                             }
                           });

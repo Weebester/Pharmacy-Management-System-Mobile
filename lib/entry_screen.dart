@@ -40,15 +40,15 @@ class EntryPageState extends State<EntryPage> {
         duration: const Duration(milliseconds: 500),
         transitionBuilder: (Widget child, Animation<double> animation) {
           return FadeTransition(
-            opacity: animation, // Fade transition between pages
+            opacity: animation,
             child: child,
           );
         },
-        child: _pages[_selectedIndex], // Using IndexedStack's index directly here
+        child: _pages[_selectedIndex],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped, // Switch pages on tap
+        onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.login),

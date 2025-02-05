@@ -52,7 +52,7 @@ class HomePageState extends State<HomePage> {
       MedPage(),
       ItemPage(),
       SellPage(),
-    ]; // Initialize the Future for fetching options
+    ];
   }
 
   @override
@@ -90,7 +90,7 @@ class HomePageState extends State<HomePage> {
               leading: Icon(Icons.question_mark),
               title: Text('Help'),
               onTap: () {
-                // Handle Home action
+                // Help action
               },
             ),
             ListTile(
@@ -102,19 +102,19 @@ class HomePageState extends State<HomePage> {
               leading: Icon(Icons.key),
               title: Text('Change Password'),
               onTap: () {
-                // Handle Settings action
+                // changePassWord action
               },
             ),
             ListTile(
               leading: Icon(Icons.message_outlined),
               title: Text('Submit a Ticket'),
               onTap: () {
-                // Handle Settings action
+                // Ticket action
               },
             ),
             if (userState.decodeToken()["Manager"] == "Yes")
               FutureBuilder<List>(
-                future: fetchBranches(), // Use FutureBuilder here
+                future: fetchBranches(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator(); // Show loading state
@@ -131,7 +131,7 @@ class HomePageState extends State<HomePage> {
                           title: Text(snapshot.data![index]),
                           leading: Icon(Icons.arrow_right),
                           onTap: () {
-                            userState.changeindex(index);
+                            userState.changeIndex(index);
                             setState(() {
                               _selectedIndex=0;
                             });

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'api_call_manager.dart';
-import 'user_state.dart';  // Make sure to import the UserState
+import 'user_state.dart';
 
 
 
@@ -31,11 +31,10 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<UserState>(
       builder: (context, userState, child) {
-        // Get pharmaIndex from UserState
-        int pharmaIndex = userState.pharmaindex;
+        int pharmaIndex = userState.pharmaIndex;
 
         return FutureBuilder<Profile>(
-          future: fetchProfile(pharmaIndex), // Fetch profile data when pharmaIndex changes
+          future: fetchProfile(pharmaIndex),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());

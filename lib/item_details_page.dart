@@ -10,7 +10,6 @@ class ItemDetailsPage extends StatelessWidget {
   final DateTime now;
   final DateTime fourMonthsFromNow;
 
-  // Constructor to initialize the page with item and calculated dates
   ItemDetailsPage({super.key, required this.item})
       : now = DateTime.now(),
         fourMonthsFromNow = DateTime.now().add(const Duration(days: 120));
@@ -164,9 +163,9 @@ class ItemDetailsPage extends StatelessWidget {
                                     ? Colors.orange // 4 months to expire
                                     : (Theme.of(context).brightness ==
                                             Brightness.dark
-                                        ? Colors.white // Use white in dark mode
+                                        ? Colors.white
                                         : Colors
-                                            .black), // Default black color in light mode
+                                            .black),
                           ),
                         ),
                         Text(
@@ -175,7 +174,7 @@ class ItemDetailsPage extends StatelessWidget {
                         ),
                         IconButton(
                           onPressed: () {
-                            // Your delete logic here
+                            //delete logic
                           },
                           icon: Icon(Icons.delete),
                         ),

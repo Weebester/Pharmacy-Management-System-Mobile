@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:mypharmacy/Bill.dart';
 import 'package:mypharmacy/user_state.dart';
 import 'package:provider/provider.dart';
 import 'stock_card.dart';
@@ -36,16 +37,17 @@ class ItemPageState extends State<ItemPage> {
   void loadPage(int pageKey) async {
     try {
       final userState = context.read<UserState>();
-      final pharmaIndex = userState.pharmaindex;
+      final bill =context.read<BillState>();
+      final pharmaIndex = userState.pharmaIndex;
 
-      items = await fetchItem(pharmaIndex: pharmaIndex, cursor: cursor); // pass cursor for the next page
+      items = await fetchItem(pharmaIndex: pharmaIndex, cursor: cursor);
       final isLastPage = items.length < pageSize;
 
       if (isLastPage) {
-        pageCont.appendLastPage(items.map((med) => ItemView(item: med)).toList());
+        pageCont.appendLastPage(items.map((item) => ItemView(item: item,bill: bill,)).toList());
       } else {
         pageCont.appendPage(
-            items.map((med) => ItemView(item: med)).toList(), pageKey + 1);
+            items.map((item) => ItemView(item: item,bill: bill,)).toList(), pageKey + 1);
       }
       cursor = items.last.itemID;
     } catch (e) {

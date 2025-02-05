@@ -16,7 +16,7 @@ class ThemePreferences {
   }
 }
 
-///////////////////////////////////////////////////////////MedView/////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void search(
     BuildContext context, Function(String, String, String, String) update) {
   String med = "";
@@ -87,13 +87,12 @@ Future<TADetails?> fetchTADetails(int taId, APICaller apiCaller) async {
     }
   } catch (e) {
     print('Error: $e');
-    return null; // Return null in case of failure
+    return null;
   }
 }
 
 void showTADetailsDialog(BuildContext context, TADetails? taDetails) {
   if (taDetails == null) {
-    // Show error dialog if no data
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -119,39 +118,40 @@ void showTADetailsDialog(BuildContext context, TADetails? taDetails) {
         return AlertDialog(
           title: Text("Therapeutic Agent Details"),
           content: SingleChildScrollView(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Therapeutic Agent: ${taDetails.ta}",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              Text(
-                "Side Effects:",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              ...taDetails.se.map((se) => Text("- $se")),
-              SizedBox(height: 8),
-              Text(
-                "Contraindications:",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              ...taDetails.cc.map((cc) => Text("- $cc")),
-              SizedBox(height: 8),
-              Text(
-                "Food Considerations:",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              ...taDetails.fc.map((fc) => Text("- $fc")),
-              SizedBox(height: 8),
-              Text(
-                "Drug-Drug Interactions:",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              ...taDetails.ddi.map((ddi) => Text("- $ddi")),
-            ],
-          )),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Therapeutic Agent: ${taDetails.ta}",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  "Side Effects:",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                ...taDetails.se.map((se) => Text("- $se")),
+                SizedBox(height: 8),
+                Text(
+                  "Contraindications:",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                ...taDetails.cc.map((cc) => Text("- $cc")),
+                SizedBox(height: 8),
+                Text(
+                  "Food Considerations:",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                ...taDetails.fc.map((fc) => Text("- $fc")),
+                SizedBox(height: 8),
+                Text(
+                  "Drug-Drug Interactions:",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                ...taDetails.ddi.map((ddi) => Text("- $ddi")),
+              ],
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () {
@@ -191,6 +191,3 @@ class TADetails {
     );
   }
 }
-
-
-

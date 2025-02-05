@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'api_call_manager.dart';
 import 'med_details_page.dart';
 
@@ -45,7 +44,7 @@ class MedView extends StatelessWidget {
                       fit: BoxFit.fill,
                       errorBuilder: (context, error, stackTrace) {
                         return Image.asset(
-                          "Assets/placeholder.png", // Path to fallback image
+                          "Assets/placeholder.png",
                           fit: BoxFit.fill,
                         );
                       },
