@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mypharmacy/item_list_page.dart';
 import 'package:mypharmacy/profile_page.dart';
+import 'package:mypharmacy/sell_page.dart';
 import 'package:provider/provider.dart';
 import 'api_call_manager.dart';
 import 'user_state.dart';
@@ -19,6 +20,7 @@ class HomePageState extends State<HomePage> {
   final GlobalKey<ProfilePageState> profileKey = GlobalKey();
   final GlobalKey<MedListState> dicKey = GlobalKey();
   final GlobalKey<ItemPageState> stockKey = GlobalKey();
+  final GlobalKey<SellPageState> billKey = GlobalKey();
   int _selectedIndex = 0;
   late List<Widget> _pages;
 
@@ -53,6 +55,7 @@ class HomePageState extends State<HomePage> {
       ProfilePage(key: profileKey),
       MedPage(),
       ItemPage(key: stockKey),
+      SellPage(key: billKey),
     ]; // Initialize the Future for fetching options
   }
 
@@ -150,20 +153,23 @@ class HomePageState extends State<HomePage> {
         ),
       ),
       body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 500),
+        duration: Duration(milliseconds: 300),
         transitionBuilder: (Widget child, Animation<double> animation) {
-          return SlideTransition(
-            position:
-                Tween<Offset>(begin: const Offset(1.0, 0.0), end: Offset.zero)
-                    .animate(animation),
+          return FadeTransition(
+            opacity: animation,
             child: child,
           );
         },
-        child: _pages[_selectedIndex],
+        child: IndexedStack(
+          key: ValueKey(_selectedIndex), // Ensures animation triggers on change
+          index: _selectedIndex,
+          children: _pages,
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped, // Switch pages on tap
+        onTap: _onItemTapped,
+        // Switch pages on tap
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),
@@ -174,10 +180,19 @@ class HomePageState extends State<HomePage> {
             label: 'Dictionary',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.inventory_2_outlined),
+            icon: Icon(Icons.inventory_2),
             label: 'Stock',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.sell),
+            label: 'Bill',
+          ),
         ],
+        backgroundColor:
+            Theme.of(context).bottomNavigationBarTheme.backgroundColor,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor:
+            Theme.of(context).colorScheme.onSurface.withValues(),
       ),
     );
   }

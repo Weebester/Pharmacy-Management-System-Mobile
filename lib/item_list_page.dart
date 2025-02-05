@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +14,7 @@ class ItemPage extends StatefulWidget {
 }
 class ItemPageState extends State<ItemPage> {
   int pharmaIndex = 0;
-  int cursor = 0;
+  int cursor = 0 ;
   static const int pageSize = 10;
   final PagingController<int, Widget> pageCont =
   PagingController(firstPageKey: 0);
@@ -94,7 +96,7 @@ class ItemPageState extends State<ItemPage> {
   }
 
   Future<List<StockItem>> fetchItem(
-      {int cursor = 0,
+      {int cursor=0,
       int limit = pageSize}) async {
     String route =
         "$serverAddress/Stock?pharma_index=$pharmaIndex&med=$med&manufacturer=$manufacturer&country=$country&ta=$ta&cursor=$cursor&limit=$limit";
