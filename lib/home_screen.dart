@@ -17,10 +17,6 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  final GlobalKey<ProfilePageState> profileKey = GlobalKey();
-  final GlobalKey<MedListState> dicKey = GlobalKey();
-  final GlobalKey<ItemPageState> stockKey = GlobalKey();
-  final GlobalKey<SellPageState> billKey = GlobalKey();
   int _selectedIndex = 0;
   late List<Widget> _pages;
 
@@ -52,10 +48,10 @@ class HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _pages = [
-      ProfilePage(key: profileKey),
+      ProfilePage(apiCaller: context.read<APICaller>()),
       MedPage(),
-      ItemPage(key: stockKey),
-      SellPage(key: billKey),
+      ItemPage(),
+      SellPage(),
     ]; // Initialize the Future for fetching options
   }
 
@@ -135,8 +131,10 @@ class HomePageState extends State<HomePage> {
                           title: Text(snapshot.data![index]),
                           leading: Icon(Icons.arrow_right),
                           onTap: () {
-                            profileKey.currentState?.updateProfile(index);
-                            stockKey.currentState?.changeStock(index);
+                            userState.changeindex(index);
+                            setState(() {
+                              _selectedIndex=0;
+                            });
                           },
                         );
                       }),
@@ -161,7 +159,7 @@ class HomePageState extends State<HomePage> {
           );
         },
         child: IndexedStack(
-          key: ValueKey(_selectedIndex), // Ensures animation triggers on change
+          key: ValueKey(_selectedIndex),
           index: _selectedIndex,
           children: _pages,
         ),

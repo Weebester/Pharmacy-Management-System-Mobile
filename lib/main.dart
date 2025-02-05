@@ -4,6 +4,7 @@ import 'package:mypharmacy/entry_Screen.dart';
 import 'package:mypharmacy/firebase_options.dart';
 import 'package:mypharmacy/home_screen.dart';
 import 'package:provider/provider.dart';
+import 'Cart.dart';
 import 'api_call_manager.dart';
 import 'custom_widgets_&_utility.dart';
 import 'user_state.dart';
@@ -18,6 +19,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => userState),
+        ChangeNotifierProvider(create: (context) => CartProvider()),
         Provider(
             create: (context) =>
                 APICaller(Provider.of<UserState>(context, listen: false))),

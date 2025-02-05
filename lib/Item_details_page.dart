@@ -6,13 +6,13 @@ import 'med_details_page.dart';
 
 class ItemDetailsPage extends StatelessWidget {
   final StockItem item;
-  DateTime now = DateTime.now();
-  DateTime FourMonths = DateTime.now().add(Duration(days: 120));
+  final DateTime now;
+  final DateTime fourMonthsFromNow;
 
-  ItemDetailsPage({
-    super.key,
-    required this.item,
-  });
+  // Constructor to initialize the page with item and calculated dates
+  ItemDetailsPage({super.key, required this.item})
+      : now = DateTime.now(),
+        fourMonthsFromNow = DateTime.now().add(const Duration(days: 120));
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +159,7 @@ class ItemDetailsPage extends StatelessWidget {
                             color: DateTime.parse(batch["EXDate"]).isBefore(now)
                                 ? Colors.red // Expired
                                 : DateTime.parse(batch["EXDate"])
-                                        .isBefore(FourMonths)
+                                        .isBefore(fourMonthsFromNow)
                                     ? Colors.orange // 4 months to expire
                                     : (Theme.of(context).brightness ==
                                             Brightness.dark

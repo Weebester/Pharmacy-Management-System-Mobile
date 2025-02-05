@@ -39,15 +39,12 @@ class EntryPageState extends State<EntryPage> {
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 500),
         transitionBuilder: (Widget child, Animation<double> animation) {
-          return SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(1.0, 0.0), // Start from the right
-              end: Offset.zero, // End at the current position
-            ).animate(animation),
+          return FadeTransition(
+            opacity: animation, // Fade transition between pages
             child: child,
           );
         },
-        child: _pages[_selectedIndex],
+        child: _pages[_selectedIndex], // Using IndexedStack's index directly here
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,

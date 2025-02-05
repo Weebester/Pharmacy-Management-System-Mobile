@@ -14,6 +14,7 @@ class UserState with ChangeNotifier {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   int _state = loggedOut;
+  int _pharmaindex = 0;
   String _accessToken = '';
   String _refreshToken = '';
 
@@ -23,6 +24,8 @@ class UserState with ChangeNotifier {
   String get accessToken => _accessToken;
 
   int get state => _state;
+
+  int get pharmaindex => _pharmaindex;
 
   // Initialize user from stored tokens
   Future<void> initializeUser() async {
@@ -39,12 +42,14 @@ class UserState with ChangeNotifier {
     }
   }
 
-  Future<void> login(String email, String password, {String name = "", String phName = ""}) async {
+  Future<void> login(String email, String password,
+      {String name = "", String phName = ""}) async {
     final url = '$serverAddress/Login';
     final url2 = '$serverAddress/sign_up';
 
     try {
-      UserCredential userCredential = await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password);
 
       final response = await http.post(
         Uri.parse(url),
@@ -80,10 +85,12 @@ class UserState with ChangeNotifier {
           // Call login again after successful sign-up
           return login(email, password);
         } else {
-          throw Exception('Sign-up failed: ${jsonDecode(signUpResponse.body)["message"]}');
+          throw Exception(
+              'Sign-up failed: ${jsonDecode(signUpResponse.body)["message"]}');
         }
       } else {
-        throw Exception('Login failed: ${jsonDecode(response.body)["message"]}');
+        throw Exception(
+            'Login failed: ${jsonDecode(response.body)["message"]}');
       }
     } on FirebaseAuthException catch (e) {
       throw Exception(e.message);
@@ -92,9 +99,8 @@ class UserState with ChangeNotifier {
     }
   }
 
-
-
-  Future<void> signUp(String name, String phName, String email, String password) async {
+  Future<void> signUp(
+      String name, String phName, String email, String password) async {
     try {
       //create FireBase Account
       await firebaseAuth.createUserWithEmailAndPassword(
@@ -102,16 +108,13 @@ class UserState with ChangeNotifier {
         password: password,
       );
       //call login
-      await login(email, password,name: name,phName: phName);
+      await login(email, password, name: name, phName: phName);
     } on FirebaseAuthException catch (e) {
       throw Exception(e.message);
     } catch (e) {
       throw Exception("An unexpected error occurred. Please try again. $e");
     }
   }
-
-
-
 
   Future<void> refreshAccessToken() async {
     final url = '$serverAddress/Refresh';
@@ -149,6 +152,12 @@ class UserState with ChangeNotifier {
     // Clear stored tokens
     await _storage.deleteAll();
 
+    notifyListeners();
+  }
+
+  void changeindex(int x) {
+    _pharmaindex = x;
+    print(x);
     notifyListeners();
   }
 

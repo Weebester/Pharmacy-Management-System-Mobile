@@ -1,7 +1,6 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:mypharmacy/user_state.dart';
 import 'package:provider/provider.dart';
 import 'api_call_manager.dart';
 import 'custom_widgets_&_utility.dart';
@@ -12,9 +11,9 @@ class ItemPage extends StatefulWidget {
   @override
   ItemPageState createState() => ItemPageState();
 }
+
 class ItemPageState extends State<ItemPage> {
-  int pharmaIndex = 0;
-  int cursor = 0 ;
+  int cursor = 0;
   static const int pageSize = 10;
   final PagingController<int, Widget> pageCont =
   PagingController(firstPageKey: 0);
@@ -24,14 +23,6 @@ class ItemPageState extends State<ItemPage> {
   String country = "";
   String ta = "";
   late List<StockItem> items;
-
-  void changeStock(int newIndex) {
-    setState(() {
-      pharmaIndex = newIndex;
-      cursor=0;
-    });
-    pageCont.refresh();
-  }
 
   @override
   void initState() {
@@ -43,11 +34,14 @@ class ItemPageState extends State<ItemPage> {
 
   void loadPage(int pageKey) async {
     try {
-      items = await fetchItem(cursor: cursor); // pass cursor for the next page
+      final userState = context.read<UserState>();
+      final pharmaIndex = userState.pharmaindex;
+
+      items = await fetchItem(pharmaIndex: pharmaIndex, cursor: cursor); // pass cursor for the next page
       final isLastPage = items.length < pageSize;
+
       if (isLastPage) {
-        pageCont
-            .appendLastPage(items.map((med) => ItemView(item: med)).toList());
+        pageCont.appendLastPage(items.map((med) => ItemView(item: med)).toList());
       } else {
         pageCont.appendPage(
             items.map((med) => ItemView(item: med)).toList(), pageKey + 1);
@@ -58,8 +52,7 @@ class ItemPageState extends State<ItemPage> {
     }
   }
 
-  void update(
-      String newMed, String newManufacturer, String newCountry, String newTa) {
+  void update(String newMed, String newManufacturer, String newCountry, String newTa) {
     setState(() {
       med = newMed;
       manufacturer = newManufacturer;
@@ -95,11 +88,14 @@ class ItemPageState extends State<ItemPage> {
     );
   }
 
-  Future<List<StockItem>> fetchItem(
-      {int cursor=0,
-      int limit = pageSize}) async {
+  Future<List<StockItem>> fetchItem({
+    required int pharmaIndex, // Ensure pharmaIndex is passed as required
+    int cursor = 0,
+    int limit = pageSize,
+  }) async {
     String route =
         "$serverAddress/Stock?pharma_index=$pharmaIndex&med=$med&manufacturer=$manufacturer&country=$country&ta=$ta&cursor=$cursor&limit=$limit";
+
     try {
       final apiCaller = context.read<APICaller>();
       final response = await apiCaller.get(route);
