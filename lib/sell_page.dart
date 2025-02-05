@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'cart.dart';
+import 'Bill.dart';
 
 class SellPage extends StatelessWidget {
   const SellPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<CartProvider>(
+    return Consumer<BillState>(
       builder: (context, cartProvider, child) {
         return Center(
           child: SingleChildScrollView(
@@ -21,13 +21,8 @@ class SellPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Bill",
+                      "Current Bill",
                       style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    Text(
-                      "Placeholder pharmacy name",
-                      style: Theme.of(context).textTheme.titleMedium,
-                      maxLines: 3,
                     ),
                     const SizedBox(height: 20),
                     const Divider(),

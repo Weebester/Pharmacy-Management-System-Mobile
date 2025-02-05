@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CartProvider with ChangeNotifier {
+class BillState with ChangeNotifier {
   // List of cart items with their details (ID, name, expDate, price)
   List<CartItem> _cartItems = [
     CartItem(id: 1, name: "Paracetamol", expDate: "2025-5-2", price: 5),
