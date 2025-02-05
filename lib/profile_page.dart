@@ -1,21 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'api_call_manager.dart';
-
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'api_call_manager.dart';
 import 'user_state.dart';  // Make sure to import the UserState
 
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'api_call_manager.dart';
-import 'user_state.dart';  // Make sure to import the UserState
+
 
 class ProfilePage extends StatelessWidget {
   final APICaller apiCaller;
 
-  // Constructor that receives the apiCaller instance
   const ProfilePage({super.key, required this.apiCaller});
 
   Future<Profile> fetchProfile(int pharmaIndex) async {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mypharmacy/custom_widgets_&_utility.dart';
+
+import 'stock_card.dart';
 import 'api_call_manager.dart';
 import 'med_details_page.dart';
 

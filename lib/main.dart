@@ -1,10 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:mypharmacy/entry_Screen.dart';
+import 'package:mypharmacy/entry_screen.dart';
 import 'package:mypharmacy/firebase_options.dart';
 import 'package:mypharmacy/home_screen.dart';
 import 'package:provider/provider.dart';
-import 'Cart.dart';
+import 'cart.dart';
 import 'api_call_manager.dart';
 import 'custom_widgets_&_utility.dart';
 import 'user_state.dart';

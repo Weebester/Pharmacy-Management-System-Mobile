@@ -152,7 +152,7 @@ class MedDetailsPage extends StatelessWidget {
                             IconButton(
                                 onPressed: () async {
                                   final taDetails = await fetchTADetails(
-                                      medDetails.ta_ids[i], apiCaller);
+                                      medDetails.taIds[i], apiCaller);
                                   SchedulerBinding.instance
                                       .addPostFrameCallback((_) {
                                     showTADetailsDialog(context, taDetails);
@@ -178,11 +178,11 @@ class MedDetailsPage extends StatelessWidget {
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 8),
-                      medDetails.alt_names.isEmpty
+                      medDetails.altNames.isEmpty
                           ? Text("None")
                           : Column(
                               children: List.generate(
-                                medDetails.alt_names.length,
+                                medDetails.altNames.length,
                                 (index) {
                                   return Container(
                                     margin: EdgeInsets.symmetric(vertical: 4),
@@ -204,7 +204,7 @@ class MedDetailsPage extends StatelessWidget {
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 MedDetailsPage(
-                                              medId: medDetails.alt_ids[index],
+                                              medId: medDetails.altIds[index],
                                             ),
                                           ),
                                         );
@@ -214,7 +214,7 @@ class MedDetailsPage extends StatelessWidget {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            medDetails.alt_names[index],
+                                            medDetails.altNames[index],
                                             style: TextStyle(fontSize: 16),
                                           ),
                                           Icon(Icons.arrow_forward_ios,
@@ -244,7 +244,7 @@ class MedDetails {
   String pom;
   List<String> effSystems;
   List<String> tas;
-  List<int> ta_ids;
+  List<int> taIds;
   List<String> addiction;
   List<String> concentrations;
   List<String> units;
@@ -252,8 +252,8 @@ class MedDetails {
   String country;
   String manufacturer;
   String form;
-  List<int> alt_ids;
-  List<String> alt_names;
+  List<int> altIds;
+  List<String> altNames;
 
   MedDetails({
     required this.medId,
@@ -261,7 +261,7 @@ class MedDetails {
     required this.pom,
     required this.effSystems,
     required this.tas,
-    required this.ta_ids,
+    required this.taIds,
     required this.addiction,
     required this.concentrations,
     required this.units,
@@ -269,8 +269,8 @@ class MedDetails {
     required this.country,
     required this.manufacturer,
     required this.form,
-    required this.alt_ids,
-    required this.alt_names,
+    required this.altIds,
+    required this.altNames,
   });
 
   factory MedDetails.fromJson(Map<String, dynamic> json) {
@@ -280,7 +280,7 @@ class MedDetails {
       pom: json["POM"],
       effSystems: List<String>.from(json["effSystems"]),
       tas: List<String>.from(json["TAs"]),
-      ta_ids: List<int>.from(json["TA_ids"]),
+      taIds: List<int>.from(json["TA_ids"]),
       addiction: List<String>.from(json["Addiction"]),
       concentrations: List<String>.from(json["concentrations"]),
       units: List<String>.from(json["units"]),
@@ -288,8 +288,8 @@ class MedDetails {
       country: json["country"],
       manufacturer: json["manufacturer"],
       form: json["Form"],
-      alt_ids: List<int>.from(json["alt_ids"]),
-      alt_names: List<String>.from(json["alt_names"]),
+      altIds: List<int>.from(json["alt_ids"]),
+      altNames: List<String>.from(json["alt_names"]),
     );
   }
 }

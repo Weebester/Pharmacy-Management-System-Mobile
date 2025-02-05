@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
+import 'dictionary_card.dart';
 import 'api_call_manager.dart';
 import 'custom_widgets_&_utility.dart';
 
