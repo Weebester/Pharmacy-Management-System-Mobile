@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:mypharmacy/user_state.dart';
 import 'package:provider/provider.dart';
 import 'api_call_manager.dart';
 import 'custom_widgets_&_utility.dart';
@@ -26,9 +27,37 @@ class MedDetailsPage extends StatelessWidget {
     }
   }
 
+  Future<bool> addItem(String med, int price, int medId, int pharmaIndex,
+      APICaller apiCaller) async {
+    String route = "$serverAddress/insert_item"; // Endpoint for inserting item
+    Map<String, dynamic> requestBody = {
+      "med": med,
+      "price": price,
+      "med_id": medId,
+      "pharma_index": pharmaIndex
+    };
+
+    try {
+      final response = await apiCaller.post(route, requestBody);
+
+      if (response.statusCode == 200) {
+        // Success - Item inserted, no return type expected
+        print("Item inserted successfully");
+        return true;
+      } else {
+        throw Exception('Failed to insert item');
+      }
+    } catch (e) {
+      print('Error: $e');
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    TextEditingController priceController = TextEditingController();
     final apiCaller = context.read<APICaller>();
+    final userState = context.read<UserState>();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Medication Details"),
@@ -95,12 +124,44 @@ class MedDetailsPage extends StatelessWidget {
                       ),
                       SizedBox(height: 16),
                       Container(
+                        margin: const EdgeInsets.symmetric(vertical: 5),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: TextField(
+                          controller: priceController,
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              InputDecoration(hintText: 'Enter item price'),
+                        ),
+                      ),
+                      Container(
                         width: double.infinity,
-                        // Make it take almost full width
                         padding: EdgeInsets.symmetric(horizontal: 10),
-                        // Optional padding to adjust button's width
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            int? price = int.tryParse(priceController.text);
+                            bool success = await addItem(
+                              medDetails.med,
+                              price!,
+                              medDetails.medId,
+                              userState.pharmaIndex,
+                              apiCaller,
+                            );
+                            priceController.clear();
+
+                            SchedulerBinding.instance.addPostFrameCallback((_) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        success ? 'Med Added!' : 'Failed to add Med!')),
+                              );
+                            });
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green,
                           ),

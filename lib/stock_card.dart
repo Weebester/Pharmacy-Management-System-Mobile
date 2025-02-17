@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mypharmacy/Bill.dart';
-
 import 'item_details_page.dart';
 import 'api_call_manager.dart';
 

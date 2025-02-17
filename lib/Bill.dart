@@ -22,7 +22,7 @@ class BillState with ChangeNotifier {
     }
   }
 
-  void clearCart() {
+  void clearBill() {
     _cartItems.clear();
     notifyListeners();
   }

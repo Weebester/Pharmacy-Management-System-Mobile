@@ -32,7 +32,7 @@ class SellPage extends StatelessWidget {
                         final item = currentBill.cartItems[index];
                         return ListTile(
                           title: Text(item.name),
-                          subtitle: Text("Price:${item.price}IQD"),
+                          subtitle: Text("Price:${item.price} IQD"),
                           onTap: () {
                             currentBill.removeItem(index);
                           },
@@ -45,7 +45,7 @@ class SellPage extends StatelessWidget {
 
                     // Total Price Calculation
                     Text(
-                      "Total Price: \$${currentBill.totalPrice}",
+                      "Total Price: ${currentBill.totalPrice} IQD",
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -58,7 +58,7 @@ class SellPage extends StatelessWidget {
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            currentBill.clearCart(); // Clear cart on cancel
+                            currentBill.clearBill(); // Clear cart on cancel
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
@@ -79,18 +79,26 @@ class SellPage extends StatelessWidget {
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  title: Text("Cart Items"),
+                                  title: Text("Bill"),
                                   content: SingleChildScrollView(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: currentBill.cartItems.map<Widget>((item) {
-                                        return Text(item.toString());
-                                      }).toList(),
+                                      children: [
+                                        ...currentBill.cartItems.map<Widget>((item) {
+                                          return Text("${item.name}: ${item.price} IQD\n${item.expDate}");
+                                        }),
+                                        const Divider(),
+                                        Text(
+                                          "Total Price: ${currentBill.totalPrice} IQD",
+                                          style: const TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   actions: <Widget>[
                                     TextButton(
                                       onPressed: () {
+                                        currentBill.clearBill();
                                         Navigator.of(context).pop();
                                       },
                                       child: Text("Close"),
