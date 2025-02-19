@@ -33,25 +33,48 @@ void search(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
-                  decoration: InputDecoration(labelText: "Medicine"),
+                  decoration: InputDecoration(
+                    labelText: "Medicine",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                  ),
                   onChanged: (value) {
                     med = value;
                   },
                 ),
+                SizedBox(height: 5),
                 TextField(
-                  decoration: InputDecoration(labelText: "Manufacturer"),
+                  decoration: InputDecoration(
+                    labelText: "Manufacturer",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                  ),
                   onChanged: (value) {
                     manufacturer = value;
                   },
                 ),
+                SizedBox(height: 5),
                 TextField(
-                  decoration: InputDecoration(labelText: "Country"),
+                  decoration: InputDecoration(
+                    labelText: "Country",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                  ),
                   onChanged: (value) {
                     country = value;
                   },
                 ),
+                SizedBox(height: 5),
                 TextField(
-                  decoration: InputDecoration(labelText: "Therapeutic Agent"),
+                  decoration: InputDecoration(
+                    labelText: "Therapeutic Agent",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                  ),
                   onChanged: (value) {
                     ta = value;
                   },

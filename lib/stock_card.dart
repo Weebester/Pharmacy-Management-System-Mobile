@@ -164,7 +164,7 @@ class StockItem {
         pom: json["Pom"],
         price: json["Price"],
         batches: List<Map<String, dynamic>>.from(
-            json["batches"]) // If no batches,then empty list
+            json["batches"])
         );
   }
 }

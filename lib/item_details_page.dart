@@ -11,7 +11,7 @@ class ItemDetailsPage extends StatefulWidget {
   final StockItem item;
   final Function() refresh;
 
-  const ItemDetailsPage({super.key, required this.item,required this.refresh});
+  const ItemDetailsPage({super.key, required this.item, required this.refresh});
 
   @override
   ItemDetailsPageState createState() => ItemDetailsPageState();
@@ -52,6 +52,50 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
     } catch (e) {
       print('Error: $e');
       return false;
+    }
+  }
+
+  Future<bool> deleteBatch(String med, int itemId, String date, int pharmaIndex,
+      APICaller apiCaller) async {
+    String route = "$serverAddress/delete_batch";
+    Map<String, dynamic> requestBody = {
+      "item_id": itemId,
+      "ex_date": date,
+      "med": med,
+      "pharma_index": pharmaIndex
+    };
+
+    try {
+      final response = await apiCaller.delete(route, data: requestBody);
+
+      if (response.statusCode == 200) {
+        print("batch deleted successfully");
+        return true;
+      } else {
+        throw Exception('Failed to batch item');
+      }
+    } catch (e) {
+      print('Error: $e');
+      return false;
+    }
+  }
+
+  Future<void> updateBatches(int itemId, APICaller apiCaller) async {
+    String route =
+        "$serverAddress/ItemBatches?item_id=$itemId"; // Endpoint for deleting item
+
+    try {
+      final response = await apiCaller.get(route);
+
+      if (response.statusCode == 200) {
+        setState(() {
+          item.batches = List<Map<String, dynamic>>.from(response.data);
+        });
+      } else {
+        throw Exception('Failed to delete item');
+      }
+    } catch (e) {
+      print('Error: $e');
     }
   }
 
@@ -135,26 +179,55 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
                     padding: EdgeInsets.symmetric(horizontal: 10),
                     child: ElevatedButton(
                       onPressed: () async {
-                        bool success = await deleteItem(item.med, item.itemID,
-                            userState.pharmaIndex, apiCaller);
+                        bool confirmDelete = await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Confirm Deletion"),
+                              content: Text(
+                                  "Are you sure you want to remove this item?"),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
+                                  child: Text("Cancel"),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: Text("Delete"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
 
-                        SchedulerBinding.instance.addPostFrameCallback((_) {
-                          if (success) {
-                            widget.refresh();
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text('Item removed successfully!')),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Failed to remove item!')),
-                            );
-                          }
-                        });
+                        if (confirmDelete == true) {
+                          bool success = await deleteItem(item.med, item.itemID,
+                              userState.pharmaIndex, apiCaller);
+
+                          SchedulerBinding.instance.addPostFrameCallback((_) {
+                            if (success) {
+                              widget.refresh();
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content:
+                                        Text('Item removed successfully!')),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text('Failed to remove item!')),
+                              );
+                            }
+                          });
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                       child: Text(
                         'Remove',
@@ -202,7 +275,63 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          String exDate = "";
+                          String count = "";
+                          await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text("Add Batch"),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    TextField(
+                                      keyboardType: TextInputType.datetime,
+                                      decoration: InputDecoration(
+                                        hintText: 'Enter ex date y-m-d',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10)),
+                                        ),
+                                      ),
+                                      onChanged: (value) {
+                                        exDate = value;
+                                      },
+                                    ),
+                                    SizedBox(height: 10),
+                                    TextField(
+                                      keyboardType: TextInputType.number,
+                                      decoration: InputDecoration(
+                                        hintText: 'Enter count',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10)),
+                                        ),
+                                      ),
+                                      onChanged: (value) {
+                                        count = value;
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text("Cancel"),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      // Handle save action here with exDate and count
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text("Add"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
                         icon: Icon(Icons.add_circle_outline),
                       ),
                     ],
@@ -231,12 +360,63 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            bool confirmDelete = await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Confirm Deletion"),
+                                  content: Text(
+                                      "Are you sure you want to remove this batch?"),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, false),
+                                      child: Text("Cancel"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, true),
+                                      child: Text("Delete"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+
+                            if (confirmDelete == true) {
+                              bool success = await deleteBatch(
+                                  item.med,
+                                  item.itemID,
+                                  batch["EXDate"],
+                                  userState.pharmaIndex,
+                                  apiCaller);
+
+                              SchedulerBinding.instance
+                                  .addPostFrameCallback((_) {
+                                if (success) {
+                                  widget.refresh();
+                                  updateBatches(item.itemID, apiCaller);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            'Batch removed successfully!')),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content:
+                                            Text('Failed to remove batch!')),
+                                  );
+                                }
+                              });
+                            }
+                          },
                           icon: Icon(Icons.delete),
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 10),
                   ],
                 ],
               ),

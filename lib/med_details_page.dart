@@ -54,7 +54,6 @@ class MedDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController priceController = TextEditingController();
     final apiCaller = context.read<APICaller>();
     final userState = context.read<UserState>();
     return Scaffold(
@@ -123,46 +122,74 @@ class MedDetailsPage extends StatelessWidget {
                       ),
                       SizedBox(height: 16),
                       Container(
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.grey,
-                            width: 2,
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: TextField(
-                          controller: priceController,
-                          keyboardType: TextInputType.number,
-                          decoration:
-                              InputDecoration(hintText: 'Enter item price'),
-                        ),
-                      ),
-                      Container(
                         width: double.infinity,
                         padding: EdgeInsets.symmetric(horizontal: 10),
                         child: ElevatedButton(
                           onPressed: () async {
-                            int? price = int.tryParse(priceController.text);
-                            bool success = await addItem(
-                              medDetails.med,
-                              price!,
-                              medDetails.medId,
-                              userState.pharmaIndex,
-                              apiCaller,
-                            );
-                            priceController.clear();
+                            String price = "";
+                            await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Enter Item Price"),
+                                  content: TextField(
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      hintText: 'Enter item price',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10)),
+                                      ),
+                                    ),
+                                    onChanged: (value) {
+                                      price = value;
+                                    },
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text("Cancel"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        int? priceValue = int.tryParse(price);
+                                        if (priceValue != null) {
+                                          bool success = await addItem(
+                                            medDetails.med,
+                                            priceValue,
+                                            medDetails.medId,
+                                            userState.pharmaIndex,
+                                            apiCaller,
+                                          );
 
-                            SchedulerBinding.instance.addPostFrameCallback((_) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content: Text(
-                                        success ? 'Med Added!' : 'Failed to add Med!')),
-                              );
-                            });
+                                          SchedulerBinding.instance
+                                              .addPostFrameCallback((_) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  success
+                                                      ? 'Med Added!'
+                                                      : 'Failed to add Med!',
+                                                ),
+                                              ),
+                                            );
+                                            Navigator.pop(context);
+                                          });
+                                        }
+                                      },
+                                      child: Text("Add"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
                           child: Text(
                             'ADD',
