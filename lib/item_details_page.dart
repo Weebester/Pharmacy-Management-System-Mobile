@@ -1,21 +1,64 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:intl/intl.dart';
-
+import 'package:mypharmacy/user_state.dart';
+import 'package:provider/provider.dart';
 import 'stock_card.dart';
 import 'api_call_manager.dart';
 import 'med_details_page.dart';
 
-class ItemDetailsPage extends StatelessWidget {
+class ItemDetailsPage extends StatefulWidget {
   final StockItem item;
-  final DateTime now;
-  final DateTime fourMonthsFromNow;
+  final Function() refresh;
 
-  ItemDetailsPage({super.key, required this.item})
-      : now = DateTime.now(),
-        fourMonthsFromNow = DateTime.now().add(const Duration(days: 120));
+  const ItemDetailsPage({super.key, required this.item,required this.refresh});
+
+  @override
+  ItemDetailsPageState createState() => ItemDetailsPageState();
+}
+
+class ItemDetailsPageState extends State<ItemDetailsPage> {
+  late StockItem item;
+  late DateTime now;
+  late DateTime fourMonthsFromNow;
+
+  @override
+  @override
+  void initState() {
+    item = widget.item;
+    super.initState();
+    now = DateTime.now();
+    fourMonthsFromNow = now.add(const Duration(days: 120));
+  }
+
+  Future<bool> deleteItem(
+      String med, int itemId, int pharmaIndex, APICaller apiCaller) async {
+    String route = "$serverAddress/delete_item"; // Endpoint for deleting item
+    Map<String, dynamic> requestBody = {
+      "med": med,
+      "Item_Id": itemId,
+      "pharma_index": pharmaIndex
+    };
+
+    try {
+      final response = await apiCaller.delete(route, data: requestBody);
+
+      if (response.statusCode == 200) {
+        print("Item deleted successfully");
+        return true;
+      } else {
+        throw Exception('Failed to delete item');
+      }
+    } catch (e) {
+      print('Error: $e');
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final apiCaller = context.read<APICaller>();
+    final userState = context.read<UserState>();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Item Details"),
@@ -89,11 +132,27 @@ class ItemDetailsPage extends StatelessWidget {
                   SizedBox(height: 16),
                   Container(
                     width: double.infinity,
-                    // Make it take almost full width
                     padding: EdgeInsets.symmetric(horizontal: 10),
-                    // Optional padding to adjust button's width
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        bool success = await deleteItem(item.med, item.itemID,
+                            userState.pharmaIndex, apiCaller);
+
+                        SchedulerBinding.instance.addPostFrameCallback((_) {
+                          if (success) {
+                            widget.refresh();
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text('Item removed successfully!')),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Failed to remove item!')),
+                            );
+                          }
+                        });
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                       ),
@@ -157,15 +216,14 @@ class ItemDetailsPage extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: DateTime.parse(batch["EXDate"]).isBefore(now)
-                                ? Colors.red // Expired
+                                ? Colors.red
                                 : DateTime.parse(batch["EXDate"])
                                         .isBefore(fourMonthsFromNow)
-                                    ? Colors.orange // 4 months to expire
+                                    ? Colors.orange
                                     : (Theme.of(context).brightness ==
                                             Brightness.dark
                                         ? Colors.white
-                                        : Colors
-                                            .black),
+                                        : Colors.black),
                           ),
                         ),
                         Text(
@@ -173,9 +231,7 @@ class ItemDetailsPage extends StatelessWidget {
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         IconButton(
-                          onPressed: () {
-                            //delete logic
-                          },
+                          onPressed: () {},
                           icon: Icon(Icons.delete),
                         ),
                       ],

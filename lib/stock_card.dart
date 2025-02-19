@@ -4,10 +4,12 @@ import 'item_details_page.dart';
 import 'api_call_manager.dart';
 
 class ItemView extends StatelessWidget {
-  const ItemView({super.key, required this.item, required this.bill});
+  const ItemView({super.key, required this.item, required this.bill , required this.refresh});
 
   final StockItem item;
   final BillState bill;
+  final Function() refresh;
+
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +111,7 @@ class ItemView extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ItemDetailsPage(item: item),
+                        builder: (context) => ItemDetailsPage(item: item,refresh:refresh),
                       ),
                     );
                   },

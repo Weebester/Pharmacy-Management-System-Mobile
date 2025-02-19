@@ -79,6 +79,7 @@ class MedListState extends State<MedPage> {
               search(context, update);
             },
             tooltip: "Search",
+            heroTag: null,
             child: const Icon(Icons.search),
           ),
         ),

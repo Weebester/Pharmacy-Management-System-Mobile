@@ -44,10 +44,10 @@ class ItemPageState extends State<ItemPage> {
       final isLastPage = items.length < pageSize;
 
       if (isLastPage) {
-        pageCont.appendLastPage(items.map((item) => ItemView(item: item,bill: bill,)).toList());
+        pageCont.appendLastPage(items.map((item) => ItemView(item: item,bill: bill, refresh:refresh,)).toList());
       } else {
         pageCont.appendPage(
-            items.map((item) => ItemView(item: item,bill: bill,)).toList(), pageKey + 1);
+            items.map((item) => ItemView(item: item,bill: bill,refresh:refresh,)).toList(), pageKey + 1);
       }
       cursor = items.last.itemID;
     } catch (e) {
@@ -61,6 +61,13 @@ class ItemPageState extends State<ItemPage> {
       manufacturer = newManufacturer;
       country = newCountry;
       ta = newTa;
+      cursor = 0;
+    });
+    pageCont.refresh();
+  }
+
+  void refresh(){
+    setState(() {
       cursor = 0;
     });
     pageCont.refresh();
@@ -84,6 +91,7 @@ class ItemPageState extends State<ItemPage> {
               search(context, update);
             },
             tooltip: "Search",
+            heroTag: null,
             child: const Icon(Icons.search),
           ),
         ),

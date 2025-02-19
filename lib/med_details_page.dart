@@ -41,7 +41,6 @@ class MedDetailsPage extends StatelessWidget {
       final response = await apiCaller.post(route, requestBody);
 
       if (response.statusCode == 200) {
-        // Success - Item inserted, no return type expected
         print("Item inserted successfully");
         return true;
       } else {

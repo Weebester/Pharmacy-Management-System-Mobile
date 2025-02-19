@@ -70,4 +70,23 @@ class APICaller {
       rethrow;
     }
   }
+
+  Future<Response> delete(String path, {dynamic data}) async {
+    try {
+      final response = await _dio.delete(path, data: data);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+// Method to perform PUT requests
+  Future<Response> put(String path, dynamic data) async {
+    try {
+      final response = await _dio.put(path, data: data);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

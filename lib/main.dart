@@ -61,7 +61,8 @@ class _MyAppState extends State<MyApp> {
     return Consumer<UserState>(
       builder: (context, userState, _) {
         return MaterialApp(
-            title: 'Flutter Demo',
+            debugShowCheckedModeBanner: false,
+            title: 'MyPharmacy',
             theme: isDarkMode ? ThemeData.dark() : ThemeData.light(),
             home: switch (userState.state) {
               1 => HomePage(onToggleTheme: toggleTheme),

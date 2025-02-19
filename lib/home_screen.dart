@@ -158,11 +158,7 @@ class HomePageState extends State<HomePage> {
             child: child,
           );
         },
-        child: IndexedStack(
-          key: ValueKey(_selectedIndex),
-          index: _selectedIndex,
-          children: _pages,
-        ),
+        child: _pages[_selectedIndex],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
