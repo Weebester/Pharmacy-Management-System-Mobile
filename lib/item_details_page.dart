@@ -41,7 +41,7 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
     };
 
     try {
-      final response = await apiCaller.delete(route, data: requestBody);
+      final response = await apiCaller.delete(route, requestBody);
 
       if (response.statusCode == 200) {
         print("Item deleted successfully");
@@ -66,7 +66,33 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
     };
 
     try {
-      final response = await apiCaller.delete(route, data: requestBody);
+      final response = await apiCaller.delete(route, requestBody);
+
+      if (response.statusCode == 200) {
+        print("batch deleted successfully");
+        return true;
+      } else {
+        throw Exception('Failed to batch item');
+      }
+    } catch (e) {
+      print('Error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> addBatch(String med, int itemId, String date, int count,
+      int pharmaIndex, APICaller apiCaller) async {
+    String route = "$serverAddress/insert_batch";
+    Map<String, dynamic> requestBody = {
+      "item_id": itemId,
+      "ex_date": date,
+      "count": count,
+      "med": med,
+      "pharma_index": pharmaIndex
+    };
+
+    try {
+      final response = await apiCaller.post(route, requestBody);
 
       if (response.statusCode == 200) {
         print("batch deleted successfully");
@@ -321,9 +347,60 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
                                     child: Text("Cancel"),
                                   ),
                                   TextButton(
-                                    onPressed: () {
-                                      // Handle save action here with exDate and count
-                                      Navigator.pop(context);
+                                    onPressed: () async {
+                                      int? countValue = int.tryParse(count);
+                                      DateTime? parsedDate;
+
+                                      try {
+                                        parsedDate = DateTime.parse(exDate);
+                                      } catch (e) {
+                                        parsedDate = null;
+                                      }
+
+                                      if (countValue != null &&
+                                          parsedDate != null) {
+                                        bool success = await addBatch(
+                                          item.med,
+                                          item.itemID,
+                                          exDate,
+                                          countValue,
+                                          userState.pharmaIndex,
+                                          apiCaller,
+                                        );
+                                        SchedulerBinding.instance
+                                            .addPostFrameCallback((_) {
+                                          if (success) {
+                                            widget.refresh();
+                                            updateBatches(
+                                                item.itemID, apiCaller);
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    'Batch added successfully!'),
+                                              ),
+                                            );
+                                          } else {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    'Failed to add batch! Please try again.'),
+                                              ),
+                                            );
+                                            Navigator.pop(context);
+                                          }
+                                        });
+                                      } else {
+                                        Navigator.pop(context);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                'Invalid input! Ensure date is in YYYY-MM-DD format.'),
+                                          ),
+                                        );
+                                      }
                                     },
                                     child: Text("Add"),
                                   ),

@@ -71,7 +71,7 @@ class APICaller {
     }
   }
 
-  Future<Response> delete(String path, {dynamic data}) async {
+  Future<Response> delete(String path, dynamic data) async {
     try {
       final response = await _dio.delete(path, data: data);
       return response;
