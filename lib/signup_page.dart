@@ -148,7 +148,8 @@ class SignupPageState extends State<SignupPage> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     ),
                     child: _isLoading
                         ? const CircularProgressIndicator(

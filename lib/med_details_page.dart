@@ -63,6 +63,8 @@ class MedDetailsPage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
       body: FutureBuilder<MedDetails?>(
         future: fetchMedDetails(medId, apiCaller),
@@ -237,15 +239,16 @@ class MedDetailsPage extends StatelessWidget {
                                   fontSize: 15, fontWeight: FontWeight.bold),
                             ),
                             IconButton(
-                                onPressed: () async {
-                                  final taDetails = await fetchTADetails(
-                                      medDetails.taIds[i], apiCaller);
-                                  SchedulerBinding.instance
-                                      .addPostFrameCallback((_) {
-                                    showTADetailsDialog(context, taDetails);
-                                  });
-                                },
-                                icon: Icon(Icons.info))
+                              onPressed: () async {
+                                final taDetails = await fetchTADetails(
+                                    medDetails.taIds[i], apiCaller);
+                                SchedulerBinding.instance
+                                    .addPostFrameCallback((_) {
+                                  showTADetailsDialog(context, taDetails);
+                                });
+                              },
+                              icon: Icon(Icons.info,color: Theme.of(context).colorScheme.primary,),
+                            )
                           ],
                         ),
                         Text(

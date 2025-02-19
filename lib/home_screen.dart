@@ -48,7 +48,7 @@ class HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _pages = [
-      ProfilePage(apiCaller: context.read<APICaller>()),
+      ProfilePage(),
       MedPage(),
       ItemPage(),
       SellPage(),
@@ -63,6 +63,8 @@ class HomePageState extends State<HomePage> {
       appBar: AppBar(
         elevation: 5,
         title: Text("Home"),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
       drawer: Drawer(
         child: ListView(
@@ -71,15 +73,19 @@ class HomePageState extends State<HomePage> {
             SizedBox(
               height: 120,
               child: DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary// Matches surface color
+                ),
                 child: Row(
                   children: [
-                    Icon(Icons.settings),
+                    Icon(Icons.settings ,color:Theme.of(context).colorScheme.onPrimary ,),
                     SizedBox(width: 10),
                     Text(
                       'Options Menu ',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 24,
+                        color: Theme.of(context).colorScheme.onPrimary
                       ),
                     ),
                   ],

@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'api_call_manager.dart';
 import 'user_state.dart';
 
-
-
 class ProfilePage extends StatelessWidget {
-  final APICaller apiCaller;
+  const ProfilePage({super.key});
 
-  const ProfilePage({super.key, required this.apiCaller});
-
-  Future<Profile> fetchProfile(int pharmaIndex) async {
+  Future<Profile> fetchProfile(int pharmaIndex, APICaller apiCaller) async {
     String route = "$serverAddress/Profile?pharma_index=$pharmaIndex";
 
     try {
@@ -27,14 +24,33 @@ class ProfilePage extends StatelessWidget {
     }
   }
 
+  Future<List<Map<String, dynamic>>> fetchLatest(
+      int pharmaIndex, APICaller apiCaller) async {
+    String route = "$serverAddress/update_logs?pharma_index=$pharmaIndex";
+
+    try {
+      final response = await apiCaller.get(route);
+
+      if (response.statusCode == 200) {
+        return List<Map<String, dynamic>>.from(response.data);
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final apiCaller = context.read<APICaller>();
     return Consumer<UserState>(
       builder: (context, userState, child) {
         int pharmaIndex = userState.pharmaIndex;
 
         return FutureBuilder<Profile>(
-          future: fetchProfile(pharmaIndex),
+          future: fetchProfile(pharmaIndex, apiCaller),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -72,19 +88,25 @@ class ProfilePage extends StatelessWidget {
                                 children: [
                                   Text(
                                     profile.userName,
-                                    style: Theme.of(context).textTheme.titleLarge,
+                                    style:
+                                        Theme.of(context).textTheme.titleLarge,
                                   ),
                                   Text(
                                     profile.email,
-                                    style: Theme.of(context).textTheme.titleSmall,
+                                    style:
+                                        Theme.of(context).textTheme.titleSmall,
                                   ),
                                   Text(
                                     profile.pharmacy,
-                                    style: Theme.of(context).textTheme.titleMedium,
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
                                   ),
                                   Text(
-                                    profile.position == "Yes" ? "Manager" : "Assistant",
-                                    style: Theme.of(context).textTheme.titleMedium,
+                                    profile.position == "Yes"
+                                        ? "Manager"
+                                        : "Assistant",
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
                                   ),
                                 ],
                               ),
@@ -110,7 +132,44 @@ class ProfilePage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 10),
+                        FutureBuilder<List<Map<String, dynamic>>>(
+                          future: fetchLatest(userState.pharmaIndex, apiCaller),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                  child: Text("Failed to load notifications"));
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return Center(
+                                  child: Text("No notifications available"));
+                            }
 
+                            return ListView(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              children: snapshot.data!.map((notification) {
+                                DateTime parsedDate = DateTime.parse(notification["date"]);
+                                String formattedDate = DateFormat('yyyy-MM-dd').format(parsedDate);
+                                String formattedTime = DateFormat('HH:mm').format(parsedDate);
+
+                                return [
+                                  Text(
+                                    "On $formattedDate at $formattedTime:",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).colorScheme.primary,
+                                    ),
+                                  ),
+                                  Text(notification["content"] ?? "No content"),
+                                  SizedBox(height: 10),
+                                ];
+                              }).expand((widget) => widget).toList()
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -147,9 +206,9 @@ class Profile {
 
   Profile(
       {required this.userName,
-        required this.pharmacy,
-        required this.email,
-        required this.position});
+      required this.pharmacy,
+      required this.email,
+      required this.position});
 
   factory Profile.fromJson(Map<String, dynamic> json) {
     return Profile(

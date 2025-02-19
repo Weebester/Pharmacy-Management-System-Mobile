@@ -63,7 +63,33 @@ class _MyAppState extends State<MyApp> {
         return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'MyPharmacy',
-            theme: isDarkMode ? ThemeData.dark() : ThemeData.light(),
+            theme: isDarkMode
+                ? ThemeData.from(
+                    colorScheme: ColorScheme(
+                      brightness: Brightness.dark,
+                      primary: Colors.tealAccent,
+                      onPrimary: Colors.black,
+                      secondary: Colors.cyanAccent,
+                      onSecondary: Colors.black,
+                      error: Colors.redAccent,
+                      onError: Colors.white,
+                      surface: Colors.grey[800]!,
+                      onSurface: Colors.white,
+                    ),
+                  )
+                : ThemeData.from(
+                    colorScheme: ColorScheme(
+                      brightness: Brightness.light,
+                      primary: Colors.teal,
+                      onPrimary: Colors.white,
+                      secondary: Colors.cyan,
+                      onSecondary: Colors.white,
+                      error: Colors.red,
+                      onError: Colors.white,
+                      surface: Colors.grey[200]!,
+                      onSurface: Colors.black,
+                    ),
+                  ),
             home: switch (userState.state) {
               1 => HomePage(onToggleTheme: toggleTheme),
               _ => EntryPage(isDarkMode: isDarkMode)

@@ -117,7 +117,8 @@ class LoginPageState extends State<LoginPage> {
                             }
                           },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     ),
                     child: _isLoading
                         ? CircularProgressIndicator(

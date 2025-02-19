@@ -136,6 +136,8 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -183,7 +185,7 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
                             ),
                             IconButton(
                               icon:
-                                  Icon(Icons.info_outline, color: Colors.blue),
+                                  Icon(Icons.info, color: Theme.of(context).colorScheme.primary),
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -287,7 +289,7 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
                       ),
                       IconButton(
                         onPressed: () {},
-                        icon: Icon(Icons.edit),
+                        icon: Icon(Icons.edit,color:Theme.of(context).colorScheme.primary),
                       ),
                     ],
                   ),
@@ -409,7 +411,7 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
                             },
                           );
                         },
-                        icon: Icon(Icons.add_circle_outline),
+                        icon: Icon(Icons.add_circle,color:Theme.of(context).colorScheme.primary),
                       ),
                     ],
                   ),
@@ -489,7 +491,7 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
                               });
                             }
                           },
-                          icon: Icon(Icons.delete),
+                          icon: Icon(Icons.delete,color:Theme.of(context).colorScheme.primary),
                         ),
                       ],
                     ),
