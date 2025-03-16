@@ -375,6 +375,7 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
                                             widget.refresh();
                                             updateBatches(
                                                 item.itemID, apiCaller);
+                                            Navigator.pop(context);
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               SnackBar(

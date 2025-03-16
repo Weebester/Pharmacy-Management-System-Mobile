@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'user_state.dart';
+
 const String serverAddress = "http://192.168.0.105:8000";
 
 class APICaller {
@@ -10,7 +11,6 @@ class APICaller {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          // Ensure we always use the latest access token
           final accessToken = _stateManager.accessToken;
           if (accessToken.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $accessToken';

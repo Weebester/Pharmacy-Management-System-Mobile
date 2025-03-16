@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:mypharmacy/user_state.dart';
 import 'package:provider/provider.dart';
 import 'Bill.dart';
+import 'api_call_manager.dart';
 
 class SellPage extends StatelessWidget {
   const SellPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final apiCaller = context.read<APICaller>();
+    final userState = Provider.of<UserState>(context);
     return Consumer<BillState>(
       builder: (context, currentBill, child) {
         return Center(
@@ -24,14 +29,36 @@ class SellPage extends StatelessWidget {
                       "Current Bill",
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
+                    TextFormField(
+                      controller: currentBill.doc,
+                      decoration: InputDecoration(
+                        labelText: 'Prescriber',
+                        hintText: 'Enter name',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter the Prescriber name';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 6),
                     const Divider(),
 
                     Column(
-                      children: List.generate(currentBill.cartItems.length, (index) {
+                      children:
+                          List.generate(currentBill.cartItems.length, (index) {
                         final item = currentBill.cartItems[index];
+                        String p = "OTC";
+                        if (item.pom == "Yes") {
+                          p = "POM";
+                        }
                         return ListTile(
-                          title: Text(item.name),
+                          title: Text("${item.name}($p)"),
                           subtitle: Text("Price:${item.price} IQD"),
                           onTap: () {
                             currentBill.removeItem(index);
@@ -79,29 +106,41 @@ class SellPage extends StatelessWidget {
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  title: Text("Bill"),
-                                  content: SingleChildScrollView(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        ...currentBill.cartItems.map<Widget>((item) {
-                                          return Text("${item.name}: ${item.price} IQD\n${item.expDate}");
-                                        }),
-                                        const Divider(),
-                                        Text(
-                                          "Total Price: ${currentBill.totalPrice} IQD",
-                                          style: const TextStyle(fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                  title: Text("Confirm Sale"),
+                                  content:Text("press confirm to finalize sell operation"),
                                   actions: <Widget>[
                                     TextButton(
                                       onPressed: () {
-                                        currentBill.clearBill();
                                         Navigator.of(context).pop();
                                       },
                                       child: Text("Close"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        var result = await currentBill.sell(
+                                            apiCaller, userState.pharmaIndex);
+                                        bool success = result["success"];
+                                        String message = result["message"];
+
+                                        SchedulerBinding.instance
+                                            .addPostFrameCallback((_) {
+                                          if (success) {
+                                            currentBill.clearBill();
+                                            Navigator.of(context).pop();
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(content: Text("sold successfully")),
+                                            );
+                                          } else {
+                                            Navigator.of(context).pop();
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(content: Text(message)),
+                                            );
+                                          }
+                                        });
+                                      },
+                                      child: Text("Confirm"),
                                     ),
                                   ],
                                 );
@@ -132,4 +171,3 @@ class SellPage extends StatelessWidget {
     );
   }
 }
-

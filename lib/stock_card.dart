@@ -79,6 +79,7 @@ class ItemView extends StatelessWidget {
                         bill.addItem(CartItem(
                             id: item.itemID,
                             name: item.med,
+                            pom: item.pom,
                             expDate: batch["EXDate"],
                             price: item.price));
                       },
