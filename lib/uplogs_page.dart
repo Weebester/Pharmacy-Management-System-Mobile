@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:mypharmacy/uplog_card.dart';
+import 'package:mypharmacy/log_card.dart';
 import 'package:mypharmacy/user_state.dart';
 import 'package:provider/provider.dart';
 import 'api_call_manager.dart';
 
+import 'custom_widgets_&_utility.dart';
 
 class UpLogsPage extends StatefulWidget {
   const UpLogsPage({super.key});
@@ -16,7 +17,8 @@ class UpLogsPage extends StatefulWidget {
 class UpLogsListState extends State<UpLogsPage> {
   static const int pageSize = 10;
   String cursor = "2200-01-01";
-  final PagingController<int, LogEntry> pageCont = PagingController(firstPageKey: 0);
+  final PagingController<int, LogEntry> pageCont =
+      PagingController(firstPageKey: 0);
 
   String from = "";
   String to = "";
@@ -40,9 +42,8 @@ class UpLogsListState extends State<UpLogsPage> {
       if (isLastPage) {
         pageCont.appendLastPage(items);
       } else {
-
-        cursor =items.last.date.split("+").first;
-        pageCont.appendPage(items,pageKey+1);
+        cursor = items.last.date.split("+").first;
+        pageCont.appendPage(items, pageKey + 1);
       }
     } catch (e) {
       pageCont.error = e;
@@ -53,34 +54,46 @@ class UpLogsListState extends State<UpLogsPage> {
     setState(() {
       from = newFrom;
       to = newTo;
-      cursor = "2020-01-01";
+      cursor = "2200-01-01";
     });
     pageCont.refresh();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        PagedListView<int, LogEntry>(
-          pagingController: pageCont,
-          builderDelegate: PagedChildBuilderDelegate<LogEntry>(
-            itemBuilder: (context, item, index) => LogEntryCard(logEntry: item),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Updates Logs"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
         ),
-        Positioned(
-          bottom: 20.0,
-          right: 20.0,
-          child: FloatingActionButton(
-            onPressed: () {
-              //search(context, update);
-            },
-            tooltip: "Search",
-            heroTag: null,
-            child: const Icon(Icons.picture_as_pdf),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+      ),
+      body: Stack(
+        children: [
+          PagedListView<int, LogEntry>(
+            pagingController: pageCont,
+            builderDelegate: PagedChildBuilderDelegate<LogEntry>(
+              itemBuilder: (context, item, index) =>
+                  LogEntryCard(logEntry: item),
+            ),
           ),
-        ),
-      ],
+          Positioned(
+            bottom: 20.0,
+            right: 20.0,
+            child: FloatingActionButton(
+              onPressed: () {
+                showDateFilterDialog(context, from, to, update);
+              },
+              tooltip: "Filter Logs by Date",
+              heroTag: null,
+              child: const Icon(Icons.date_range),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -106,7 +119,9 @@ class UpLogsListState extends State<UpLogsPage> {
 
       if (response.statusCode == 200) {
         List<dynamic> jsonResponse = response.data;
-        return jsonResponse.map((jsonObject) => LogEntry.fromJson(jsonObject)).toList();
+        return jsonResponse
+            .map((jsonObject) => LogEntry.fromJson(jsonObject))
+            .toList();
       } else {
         throw Exception('Failed to load data');
       }

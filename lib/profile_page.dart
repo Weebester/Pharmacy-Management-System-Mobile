@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mypharmacy/uplogs_page.dart';
 import 'package:provider/provider.dart';
 import 'api_call_manager.dart';
 import 'user_state.dart';
@@ -62,119 +63,159 @@ class ProfilePage extends StatelessWidget {
 
             Profile profile = snapshot.data!;
 
-            return Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Card(
-                  elevation: 4,
-                  margin: EdgeInsets.symmetric(horizontal: 8),
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Header Section
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 40,
-                                child: Text(profile.userName[0]),
-                              ),
-                              const SizedBox(width: 20),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+            return Stack(
+              children: [
+                Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Card(
+                      elevation: 4,
+                      margin: EdgeInsets.symmetric(horizontal: 8),
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Header Section
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
                                 children: [
-                                  Text(
-                                    profile.userName,
-                                    style:
-                                        Theme.of(context).textTheme.titleLarge,
+                                  CircleAvatar(
+                                    radius: 40,
+                                    child: Text(profile.userName[0]),
                                   ),
-                                  Text(
-                                    profile.email,
-                                    style:
-                                        Theme.of(context).textTheme.titleSmall,
-                                  ),
-                                  Text(
-                                    profile.pharmacy,
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                  Text(
-                                    profile.position == "Yes"
-                                        ? "Manager"
-                                        : "Assistant",
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
+                                  const SizedBox(width: 20),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        profile.userName,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge,
+                                      ),
+                                      Text(
+                                        profile.email,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleSmall,
+                                      ),
+                                      Text(
+                                        profile.pharmacy,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
+                                      Text(
+                                        profile.position == "Yes"
+                                            ? "Manager"
+                                            : "Assistant",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        const Divider(),
-                        const Text(
-                          "Pharmacists",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const Divider(),
-                        // Notification Section (List)
-                        const Text(
-                          "Notifications",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        FutureBuilder<List<Map<String, dynamic>>>(
-                          future: fetchLatest(userState.pharmaIndex, apiCaller),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                  child: Text("Failed to load notifications"));
-                            } else if (!snapshot.hasData ||
-                                snapshot.data!.isEmpty) {
-                              return Center(
-                                  child: Text("No notifications available"));
-                            }
+                            ),
+                            const SizedBox(height: 20),
+                            const Divider(),
+                            const Text(
+                              "Pharmacists",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const Divider(),
+                            // Notification Section (List)
+                            const Text(
+                              "Notifications",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            FutureBuilder<List<Map<String, dynamic>>>(
+                              future:
+                                  fetchLatest(userState.pharmaIndex, apiCaller),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                      child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return Center(
+                                      child:
+                                          Text("Failed to load notifications"));
+                                } else if (!snapshot.hasData ||
+                                    snapshot.data!.isEmpty) {
+                                  return Center(
+                                      child:
+                                          Text("No notifications available"));
+                                }
 
-                            return ListView(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              children: snapshot.data!.map((notification) {
-                                DateTime parsedDate = DateTime.parse(notification["date"]);
-                                String formattedDate = DateFormat('yyyy-MM-dd').format(parsedDate);
-                                String formattedTime = DateFormat('HH:mm').format(parsedDate);
+                                return ListView(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    children: snapshot.data!
+                                        .map((notification) {
+                                          DateTime parsedDate = DateTime.parse(
+                                              notification["date"]);
+                                          String formattedDate =
+                                              DateFormat('yyyy-MM-dd')
+                                                  .format(parsedDate);
+                                          String formattedTime =
+                                              DateFormat('HH:mm')
+                                                  .format(parsedDate);
 
-                                return [
-                                  Text(
-                                    "On $formattedDate at $formattedTime:",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Theme.of(context).colorScheme.primary,
-                                    ),
-                                  ),
-                                  Text(notification["content"] ?? "No content"),
-                                  SizedBox(height: 10),
-                                ];
-                              }).expand((widget) => widget).toList()
-                            );
-                          },
+                                          return [
+                                            Text(
+                                              "On $formattedDate at $formattedTime:",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary,
+                                              ),
+                                            ),
+                                            Text(notification["content"] ??
+                                                "No content"),
+                                            SizedBox(height: 10),
+                                          ];
+                                        })
+                                        .expand((widget) => widget)
+                                        .toList());
+                              },
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
+                Positioned(
+                  bottom: 20.0,
+                  right: 20.0,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UpLogsPage(),
+                        ),
+                      );
+                    },
+                    tooltip: "Search",
+                    heroTag: null,
+                    child: const Icon(Icons.search),
+                  ),
+                ),
+              ],
             );
           },
         );

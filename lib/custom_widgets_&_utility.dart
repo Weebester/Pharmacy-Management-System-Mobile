@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mypharmacy/api_call_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -212,5 +213,68 @@ class TADetails {
       fc: List<String>.from(json["FC"]),
       ddi: List<String>.from(json["DDI"]),
     );
+  }
+}
+////////////////////////////////////////////////apply date filter///////////////
+void showDateFilterDialog(BuildContext context,String from, String to, Function(String, String) update) {
+  String newFrom = from;
+  String newTo = to;
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text("Select Date Range"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              decoration:
+              const InputDecoration(hintText: "From (YYYY-MM-DD)"),
+              onChanged: (value) => newFrom = value,
+            ),
+            TextField(
+              decoration: const InputDecoration(hintText: "To (YYYY-MM-DD)"),
+              onChanged: (value) => newTo = value,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => applyDateFilter(context,newFrom, newTo,update),
+            child: const Text("Apply"),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void applyDateFilter(BuildContext context,String newFrom, String newTo, Function(String, String) update) {
+  if (!_isValidDateFormat(newFrom)) {
+    newFrom = "";
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Invalid 'From' date format. Please use YYYY-MM-DD.")));
+  }
+  if (!_isValidDateFormat(newTo)) {
+    newTo = "";
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Invalid 'To' date format. Please use YYYY-MM-DD.")));
+  }
+  update(newFrom, newTo);
+  Navigator.pop(context);
+}
+
+bool _isValidDateFormat(String date) {
+  if (date.isEmpty) return false;
+  try {
+    DateFormat("yyyy-MM-dd").parseStrict(date);
+    return true;
+  } catch (_) {
+    return false;
   }
 }
