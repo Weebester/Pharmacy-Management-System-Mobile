@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:mypharmacy/selllogs_page.dart';
 import 'package:mypharmacy/user_state.dart';
 import 'package:provider/provider.dart';
 import 'Bill.dart';
@@ -14,7 +15,10 @@ class SellPage extends StatelessWidget {
     final userState = Provider.of<UserState>(context);
     return Consumer<BillState>(
       builder: (context, currentBill, child) {
-        return Center(
+        return
+          Stack(
+              children: [
+          Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Card(
@@ -166,7 +170,26 @@ class SellPage extends StatelessWidget {
               ),
             ),
           ),
-        );
+        ),
+                Positioned(
+                  bottom: 20.0,
+                  right: 20.0,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SellLogsPage(),
+                        ),
+                      );
+                    },
+                    tooltip: "Logs",
+                    heroTag: null,
+                    child: const Icon(Icons.history_edu),
+                  ),
+                ),
+              ],
+          );
       },
     );
   }

@@ -210,9 +210,9 @@ class ProfilePage extends StatelessWidget {
                         ),
                       );
                     },
-                    tooltip: "Search",
+                    tooltip: "Logs",
                     heroTag: null,
-                    child: const Icon(Icons.search),
+                    child: const Icon(Icons.history_edu),
                   ),
                 ),
               ],
