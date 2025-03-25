@@ -229,12 +229,26 @@ void showDateFilterDialog(BuildContext context,String from, String to, Function(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
-              decoration:
-              const InputDecoration(hintText: "From (YYYY-MM-DD)"),
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'From (YYYY-MM-DD)',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                      Radius.circular(10)),
+                ),
+              ),
               onChanged: (value) => newFrom = value,
             ),
+            SizedBox(height: 10),
             TextField(
-              decoration: const InputDecoration(hintText: "To (YYYY-MM-DD)"),
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'To (YYYY-MM-DD)',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                      Radius.circular(10)),
+                ),
+              ),
               onChanged: (value) => newTo = value,
             ),
           ],

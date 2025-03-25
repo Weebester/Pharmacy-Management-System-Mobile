@@ -106,6 +106,31 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
     }
   }
 
+  Future<bool> changePrice(String med, int itemId, int price, int pharmaIndex,
+      APICaller apiCaller) async {
+    String route = "$serverAddress/changePrice";
+    Map<String, dynamic> requestBody = {
+      "item_id": itemId,
+      "newPrice": price,
+      "med": med,
+      "index": pharmaIndex
+    };
+
+    try {
+      final response = await apiCaller.put(route, requestBody);
+
+      if (response.statusCode == 200) {
+        print("batch deleted successfully");
+        return true;
+      } else {
+        throw Exception('Failed to batch item');
+      }
+    } catch (e) {
+      print('Error: $e');
+      return false;
+    }
+  }
+
   Future<void> updateBatches(int itemId, APICaller apiCaller) async {
     String route =
         "$serverAddress/ItemBatches?item_id=$itemId"; // Endpoint for deleting item
@@ -184,8 +209,8 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
                               ),
                             ),
                             IconButton(
-                              icon:
-                                  Icon(Icons.info, color: Theme.of(context).colorScheme.primary),
+                              icon: Icon(Icons.info,
+                                  color: Theme.of(context).colorScheme.primary),
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -288,8 +313,71 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.edit,color:Theme.of(context).colorScheme.primary),
+                        onPressed: () async {
+                          String price = "";
+                          await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text("Change Price"),
+                                content: TextField(
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    labelText: 'New Price',
+                                    border: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(10)),
+                                    ),
+                                  ),
+                                  onChanged: (value) {
+                                    price = value;
+                                  },
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text("Cancel"),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      int? priceValue = int.tryParse(price);
+                                      if (priceValue != null) {
+                                        bool success = await changePrice(
+                                            item.med,
+                                            item.itemID,
+                                            priceValue,
+                                            userState.pharmaIndex,
+                                            apiCaller);
+                                        if (success){
+                                          setState(() {
+                                            item.price=priceValue;
+                                          });
+                                        }
+                                        SchedulerBinding.instance
+                                            .addPostFrameCallback((_) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                success
+                                                    ? 'price changed!'
+                                                    : 'Failed to change!',
+                                              ),
+                                            ),
+                                          );
+                                          Navigator.pop(context);
+                                        });
+                                      }
+                                    },
+                                    child: Text("Change"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        icon: Icon(Icons.edit,
+                            color: Theme.of(context).colorScheme.primary),
                       ),
                     ],
                   ),
@@ -317,7 +405,7 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
                                     TextField(
                                       keyboardType: TextInputType.datetime,
                                       decoration: InputDecoration(
-                                        hintText: 'Enter ex date y-m-d',
+                                        labelText: 'EXDate (yyyy-mm-dd)',
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(10)),
@@ -331,7 +419,7 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
                                     TextField(
                                       keyboardType: TextInputType.number,
                                       decoration: InputDecoration(
-                                        hintText: 'Enter count',
+                                        labelText: 'count',
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(10)),
@@ -412,7 +500,8 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
                             },
                           );
                         },
-                        icon: Icon(Icons.add_circle,color:Theme.of(context).colorScheme.primary),
+                        icon: Icon(Icons.add_circle,
+                            color: Theme.of(context).colorScheme.primary),
                       ),
                     ],
                   ),
@@ -492,7 +581,8 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
                               });
                             }
                           },
-                          icon: Icon(Icons.delete,color:Theme.of(context).colorScheme.primary),
+                          icon: Icon(Icons.delete,
+                              color: Theme.of(context).colorScheme.primary),
                         ),
                       ],
                     ),

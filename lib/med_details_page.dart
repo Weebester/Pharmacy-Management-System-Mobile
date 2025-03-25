@@ -137,7 +137,7 @@ class MedDetailsPage extends StatelessWidget {
                                   content: TextField(
                                     keyboardType: TextInputType.number,
                                     decoration: InputDecoration(
-                                      hintText: 'Enter item price',
+                                      labelText: 'Price',
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(10)),
