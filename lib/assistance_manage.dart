@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:mypharmacy/user_state.dart';
+import 'package:provider/provider.dart';
+
+import 'api_call_manager.dart';
 
 class AssistantManage extends StatefulWidget {
   final List br;
-  const AssistantManage( {super.key , required this.br});
+
+  const AssistantManage({super.key, required this.br});
 
   @override
   AssistantManageState createState() => AssistantManageState();
@@ -14,18 +20,17 @@ class AssistantManageState extends State<AssistantManage> {
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  int _selectedBranchIndex = 0;
 
   @override
   Widget build(BuildContext context) {
+    final userState = Provider.of<UserState>(context);
+    final apiCaller = context.read<APICaller>();
 
     return Scaffold(
       appBar: AppBar(
         elevation: 5,
-        title: Text("Assistants Management"),
+        title: const Text("Assistants Management"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -42,30 +47,82 @@ class AssistantManageState extends State<AssistantManage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "Add new Assistance",
-                        style: const TextStyle(
+                      const Text(
+                        "Add new Assistant",
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: () async {},
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            try {
+                              await userState.addAssistant(
+                                _nameController.text,
+                                _emailController.text,
+                                _passwordController.text,
+                                _selectedBranchIndex,
+                                apiCaller,
+                              );
+                              SchedulerBinding.instance
+                                  .addPostFrameCallback((_) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content:
+                                        Text('Assistant added successfully'),
+                                  ),
+                                );
+                              });
+                            } catch (e) {
+                              SchedulerBinding.instance
+                                  .addPostFrameCallback((_) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Error: ${e.toString()}'),
+                                  ),
+                                );
+                              });
+                            }
+                          }
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
                               Theme.of(context).colorScheme.primary,
                           foregroundColor:
                               Theme.of(context).colorScheme.onPrimary,
                         ),
-                        child: Text("Add"),
+                        child: const Text("Add"),
                       ),
                     ],
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
+                  DropdownButtonFormField<int>(
+                    value: _selectedBranchIndex,
+                    decoration: InputDecoration(
+                      labelText: 'Branch',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                    ),
+                    items: List.generate(
+                      widget.br.length,
+                      (index) => DropdownMenuItem<int>(
+                        value: index,
+                        child: Text("Branch ${widget.br[index]}"),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedBranchIndex = value ?? 0;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 30),
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
@@ -75,14 +132,11 @@ class AssistantManageState extends State<AssistantManage> {
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      return null;
-                    },
+                    validator: (value) => value == null || value.isEmpty
+                        ? 'Please enter your email'
+                        : null,
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   TextFormField(
                     controller: _passwordController,
                     obscureText: true,
@@ -93,14 +147,11 @@ class AssistantManageState extends State<AssistantManage> {
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      return null;
-                    },
+                    validator: (value) => value == null || value.isEmpty
+                        ? 'Please enter your password'
+                        : null,
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   TextFormField(
                     controller: _nameController,
                     decoration: InputDecoration(
@@ -110,15 +161,12 @@ class AssistantManageState extends State<AssistantManage> {
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your Name';
-                      }
-                      return null;
-                    },
+                    validator: (value) => value == null || value.isEmpty
+                        ? 'Please enter your Name'
+                        : null,
                   ),
-                  SizedBox(height: 40),
-                  Divider(),
+                  const SizedBox(height: 40),
+                  const Divider(),
                 ],
               ),
             ),
