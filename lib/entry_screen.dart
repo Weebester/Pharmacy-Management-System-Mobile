@@ -37,7 +37,7 @@ class EntryPageState extends State<EntryPage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 5,
-        title: Text("Login"),
+        title: Text("Authentication"),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),

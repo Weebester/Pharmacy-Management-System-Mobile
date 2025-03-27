@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:mypharmacy/assistance_manage.dart';
 import 'package:mypharmacy/item_list_page.dart';
 import 'package:mypharmacy/profile_page.dart';
 import 'package:mypharmacy/sell_page.dart';
@@ -73,31 +75,25 @@ class HomePageState extends State<HomePage> {
             SizedBox(
               height: 120,
               child: DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary// Matches surface color
-                ),
+                decoration:
+                    BoxDecoration(color: Theme.of(context).colorScheme.primary),
                 child: Row(
                   children: [
-                    Icon(Icons.settings ,color:Theme.of(context).colorScheme.onPrimary ,),
+                    Icon(
+                      Icons.settings,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
                     SizedBox(width: 10),
                     Text(
                       'Options Menu ',
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
-                        color: Theme.of(context).colorScheme.onPrimary
-                      ),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                          color: Theme.of(context).colorScheme.onPrimary),
                     ),
                   ],
                 ),
               ),
-            ),
-            ListTile(
-              leading: Icon(Icons.question_mark),
-              title: Text('Help'),
-              onTap: () {
-                // Help action
-              },
             ),
             ListTile(
               leading: Icon(Icons.dark_mode),
@@ -139,13 +135,29 @@ class HomePageState extends State<HomePage> {
                           onTap: () {
                             userState.changeIndex(index);
                             setState(() {
-                              _selectedIndex=0;
+                              _selectedIndex = 0;
                             });
                           },
                         );
                       }),
                     );
                   }
+                },
+              ),
+            if (userState.decodeToken()["Manager"] == "Yes")
+              ListTile(
+                leading: Icon(Icons.accessibility),
+                title: Text('Mange Assistants'),
+                onTap: () async {
+                  List br = await fetchBranches();
+                  SchedulerBinding.instance.addPostFrameCallback((_) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AssistantManage(br: br),
+                      ),
+                    );
+                  });
                 },
               ),
             ListTile(

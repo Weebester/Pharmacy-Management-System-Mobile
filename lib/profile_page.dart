@@ -124,16 +124,7 @@ class ProfilePage extends StatelessWidget {
                             const SizedBox(height: 20),
                             const Divider(),
                             const Text(
-                              "Pharmacists",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const Divider(),
-                            // Notification Section (List)
-                            const Text(
-                              "Notifications",
+                              "Latest Updates",
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
