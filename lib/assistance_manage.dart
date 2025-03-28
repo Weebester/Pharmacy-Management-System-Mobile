@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:mypharmacy/user_state.dart';
 import 'package:provider/provider.dart';
-
 import 'api_call_manager.dart';
+import 'assistant_card.dart';
 
 class AssistantManage extends StatefulWidget {
   final List br;
@@ -21,6 +21,18 @@ class AssistantManageState extends State<AssistantManage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   int _selectedBranchIndex = 0;
+
+  List<Assistant> _assistants = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAssistants().then((temp) {
+      setState(() {
+        _assistants = temp;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -165,8 +177,23 @@ class AssistantManageState extends State<AssistantManage> {
                         ? 'Please enter your Name'
                         : null,
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 30),
                   const Divider(),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Assistants List:",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      )
+                    ],
+                  ),
+                  ..._assistants
+                      .map((assistant) => AssistantCard(assistant: assistant)),
                 ],
               ),
             ),
@@ -174,5 +201,25 @@ class AssistantManageState extends State<AssistantManage> {
         ),
       ),
     );
+  }
+
+  Future<List<Assistant>> fetchAssistants() async {
+    String route = "$serverAddress/get_assistant";
+    try {
+      final apiCaller = context.read<APICaller>();
+      final response = await apiCaller.get(route);
+
+      if (response.statusCode == 200) {
+        List<dynamic> jsonResponse = response.data;
+        return jsonResponse
+            .map((jsonObject) => Assistant.fromJson(jsonObject))
+            .toList();
+      } else {
+        throw Exception('Failed to load assistant data');
+      }
+    } catch (e) {
+      print('Error: $e');
+      throw Exception('Error fetching assistants: $e');
+    }
   }
 }
