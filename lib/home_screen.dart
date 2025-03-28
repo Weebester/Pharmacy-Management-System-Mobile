@@ -36,7 +36,7 @@ class HomePageState extends State<HomePage> {
       final response = await apiCaller.get(route);
 
       if (response.statusCode == 200) {
-        return response.data; // Return the list of branches
+        return response.data;
       } else {
         throw Exception('Failed to load branches');
       }
@@ -103,8 +103,117 @@ class HomePageState extends State<HomePage> {
             ListTile(
               leading: Icon(Icons.key),
               title: Text('Change Password'),
-              onTap: () {
-                // changePassWord action
+              onTap: () async {
+                // Show the AlertDialog to change the password
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    TextEditingController oldPasswordController =
+                        TextEditingController();
+                    TextEditingController newPasswordController =
+                        TextEditingController();
+                    TextEditingController confirmPasswordController =
+                        TextEditingController();
+
+                    return AlertDialog(
+                      title: Text("Change Password"),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextField(
+                            controller: oldPasswordController,
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              labelText: 'Old Password',
+                              hintText: 'Enter your old password',
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 15),
+                          TextField(
+                            controller: newPasswordController,
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              labelText: 'New Password',
+                              hintText: 'Enter a new password',
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 15),
+                          TextField(
+                            controller: confirmPasswordController,
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              labelText: 'Confirm New Password',
+                              hintText: 'Confirm your new password',
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            // Close the dialog
+                            Navigator.of(context).pop();
+                          },
+                          child: Text("Cancel"),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            String oldPassword = oldPasswordController.text;
+                            String newPassword = newPasswordController.text;
+                            String confirmPassword =
+                                confirmPasswordController.text;
+
+                            if (newPassword != confirmPassword) {
+                              // Show error if new passwords don't match
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text("New passwords don't match")),
+                              );
+                              return;
+                            }
+
+                            try {
+                              await userState.changePassword(
+                                  oldPassword, newPassword);
+
+                              SchedulerBinding.instance
+                                  .addPostFrameCallback((_) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          "Password changed successfully!")),
+                                );
+                                Navigator.of(context).pop();
+                              });
+                            } catch (e) {
+                              SchedulerBinding.instance
+                                  .addPostFrameCallback((_) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text("Error: ${e.toString()}")),
+                                );
+                                Navigator.of(context).pop();
+                              });
+                            }
+                          },
+                          child: Text("Change Password"),
+                        ),
+                      ],
+                    );
+                  },
+                );
               },
             ),
             ListTile(
@@ -119,7 +228,7 @@ class HomePageState extends State<HomePage> {
                 future: fetchBranches(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator(); // Show loading state
+                    return CircularProgressIndicator();
                   } else if (snapshot.hasError) {
                     return ListTile(title: Text('Error fetching branches'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {

@@ -144,6 +144,30 @@ class UserState with ChangeNotifier {
     }
   }
 
+  Future<void> changePassword(String oldPassword, String newPassword) async {
+    try {
+      User? user = firebaseAuth.currentUser;
+
+      if (user != null) {
+        final AuthCredential credential = EmailAuthProvider.credential(
+          email: user.email!,
+          password: oldPassword,
+        );
+
+        await user.reauthenticateWithCredential(credential);
+
+        await user.updatePassword(newPassword);
+
+        print("Password updated successfully!");
+      } else {
+        throw Exception("No user is currently signed in.");
+      }
+    } catch (e) {
+      print("Error: ${e.toString()}");
+      throw Exception("Failed to change password: ${e.toString()}");
+    }
+  }
+
   void logout() async {
     _accessToken = '';
     _refreshToken = '';
