@@ -116,43 +116,6 @@ class UserState with ChangeNotifier {
     }
   }
 
-  Future<void> addAssistant(
-      String name, String email, String password,int phIndex, APICaller apiCaller) async {
-    try {
-
-      await firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      String fbId = firebaseAuth.currentUser!.uid;
-
-      String route = "$serverAddress/add_assistant";
-      Map<String, dynamic> requestBody = {
-        "name": name,
-        "email": email,
-        "FB_id": fbId,
-        "index": phIndex
-      };
-
-      try {
-        final response = await apiCaller.post(route, requestBody);
-
-        if (response.statusCode == 200) {
-        } else {
-          throw Exception('Failed to add assistant');
-        }
-      } catch (e) {
-        print('Error: $e');
-        rethrow;
-      }
-    } on FirebaseAuthException catch (e) {
-      throw Exception(e.message);
-    } catch (e) {
-      throw Exception("An unexpected error occurred. Please try again. $e");
-    }
-  }
-
   Future<void> refreshAccessToken() async {
     final url = '$serverAddress/Refresh';
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:mypharmacy/user_state.dart';
 import 'package:provider/provider.dart';
 import 'api_call_manager.dart';
 import 'assistant_card.dart';
@@ -34,9 +33,16 @@ class AssistantManageState extends State<AssistantManage> {
     });
   }
 
+  void updateAssistList() {
+    fetchAssistants().then((temp) {
+      setState(() {
+        _assistants = temp;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final userState = Provider.of<UserState>(context);
     final apiCaller = context.read<APICaller>();
 
     return Scaffold(
@@ -73,33 +79,44 @@ class AssistantManageState extends State<AssistantManage> {
                       ElevatedButton(
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            try {
-                              await userState.addAssistant(
-                                _nameController.text,
-                                _emailController.text,
-                                _passwordController.text,
-                                _selectedBranchIndex,
-                                apiCaller,
-                              );
-                              SchedulerBinding.instance
-                                  .addPostFrameCallback((_) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content:
-                                        Text('Assistant added successfully'),
-                                  ),
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Confirm Action'),
+                                  content: Text(
+                                      'Are you sure you want to add this assistant?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                      child: Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        String M = await addAssistant(
+                                          _nameController.text,
+                                          _emailController.text,
+                                          _passwordController.text,
+                                          _selectedBranchIndex,
+                                          apiCaller,
+                                        );
+                                        SchedulerBinding.instance
+                                            .addPostFrameCallback((_) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(content: Text(M)),
+                                          );
+                                          Navigator.of(context).pop();
+                                          updateAssistList();
+                                        });
+                                      },
+                                      child: Text('Confirm'),
+                                    ),
+                                  ],
                                 );
-                              });
-                            } catch (e) {
-                              SchedulerBinding.instance
-                                  .addPostFrameCallback((_) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Error: ${e.toString()}'),
-                                  ),
-                                );
-                              });
-                            }
+                              },
+                            );
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -192,8 +209,11 @@ class AssistantManageState extends State<AssistantManage> {
                       )
                     ],
                   ),
-                  ..._assistants
-                      .map((assistant) => AssistantCard(assistant: assistant)),
+                  ..._assistants.map((assistant) => AssistantCard(
+                        assistant: assistant,
+                        apiCaller: apiCaller,
+                        updateList: updateAssistList,
+                      )),
                 ],
               ),
             ),
@@ -220,6 +240,29 @@ class AssistantManageState extends State<AssistantManage> {
     } catch (e) {
       print('Error: $e');
       throw Exception('Error fetching assistants: $e');
+    }
+  }
+
+  Future<String> addAssistant(String name, String email, String password,
+      int phIndex, APICaller apiCaller) async {
+    String route = "$serverAddress/add_assistant";
+    Map<String, dynamic> requestBody = {
+      "name": name,
+      "email": email,
+      "passW": password,
+      "index": phIndex
+    };
+
+    try {
+      final response = await apiCaller.post(route, requestBody);
+
+      if (response.statusCode == 200) {
+        return "Assistant added successfully";
+      } else {
+        return ('Failed to add assistant: ${response.data}');
+      }
+    } catch (e) {
+      return ('Failed to add assistant');
     }
   }
 }
