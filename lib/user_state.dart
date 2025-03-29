@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:mypharmacy/Bill.dart';
 
 import 'api_call_manager.dart';
 
@@ -169,6 +170,7 @@ class UserState with ChangeNotifier {
   }
 
   void logout() async {
+    _pharmaIndex = 0;
     _accessToken = '';
     _refreshToken = '';
     _state = loggedOut;
@@ -181,7 +183,6 @@ class UserState with ChangeNotifier {
 
   void changeIndex(int x) {
     _pharmaIndex = x;
-    //print(x);
     notifyListeners();
   }
 
