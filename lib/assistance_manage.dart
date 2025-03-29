@@ -88,28 +88,28 @@ class AssistantManageState extends State<AssistantManage> {
                                       'Are you sure you want to add this assistant?'),
                                   actions: [
                                     TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(),
+                                      onPressed: () => Navigator.pop(context),
                                       child: Text('Cancel'),
                                     ),
                                     TextButton(
-                                      onPressed: () async {
-                                        String M = await addAssistant(
+                                      onPressed: () {
+                                        addAssistant(
                                           _nameController.text,
                                           _emailController.text,
                                           _passwordController.text,
                                           _selectedBranchIndex,
                                           apiCaller,
-                                        );
-                                        SchedulerBinding.instance
-                                            .addPostFrameCallback((_) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(content: Text(M)),
-                                          );
-                                          Navigator.of(context).pop();
-                                          updateAssistList();
+                                        ).then((M) {
+                                          SchedulerBinding.instance
+                                              .addPostFrameCallback((_) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(content: Text(M)),
+                                            );
+                                            Navigator.pop(context);
+                                          });
                                         });
+                                        updateAssistList();
                                       },
                                       child: Text('Confirm'),
                                     ),
@@ -257,7 +257,7 @@ class AssistantManageState extends State<AssistantManage> {
       final response = await apiCaller.post(route, requestBody);
 
       if (response.statusCode == 200) {
-        return "Assistant added successfully";
+        return response.data;
       } else {
         return ('Failed to add assistant: ${response.data}');
       }

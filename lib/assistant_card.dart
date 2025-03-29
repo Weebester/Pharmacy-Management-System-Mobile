@@ -33,8 +33,7 @@ class AssistantCard extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
-                    color: theme.colorScheme
-                        .primary,
+                    color: theme.colorScheme.primary,
                   ),
                 ),
                 IconButton(
@@ -48,7 +47,7 @@ class AssistantCard extends StatelessWidget {
                                 'Are you sure you want to add this assistant?'),
                             actions: [
                               TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
+                                onPressed: () => Navigator.pop(context),
                                 // Close dialog
                                 child: Text('Cancel'),
                               ),
@@ -79,7 +78,7 @@ class AssistantCard extends StatelessWidget {
                                             content:
                                                 Text('Error: ${e.toString()}')),
                                       );
-                                      Navigator.of(context).pop();
+                                      Navigator.pop(context);
                                     });
                                   }
                                   updateList();
