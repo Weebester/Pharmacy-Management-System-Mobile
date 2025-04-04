@@ -27,7 +27,7 @@ class ProfilePage extends StatelessWidget {
 
   Future<List<Map<String, dynamic>>> fetchLatest(
       int pharmaIndex, APICaller apiCaller) async {
-    String route = "$serverAddress/update_logs?pharma_index=$pharmaIndex";
+    String route = "$serverAddress/update_logs?pharma_index=$pharmaIndex&limit=7";
 
     try {
       final response = await apiCaller.get(route);
