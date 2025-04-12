@@ -261,61 +261,6 @@ class MedDetailsPage extends StatelessWidget {
                             style: TextStyle(fontWeight: FontWeight.bold)),
                         SizedBox(height: 16),
                       ],
-                      Divider(),
-                      Text(
-                        "Commercial Alternatives",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                      medDetails.altNames.isEmpty
-                          ? Text("None")
-                          : Column(
-                              children: List.generate(
-                                medDetails.altNames.length,
-                                (index) {
-                                  return Container(
-                                    margin: EdgeInsets.symmetric(vertical: 4),
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          side: BorderSide(
-                                              color: Colors.grey, width: 1),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          backgroundColor: Colors.white,
-                                          foregroundColor: Colors.black54,
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 12, horizontal: 16)),
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                MedDetailsPage(
-                                              medId: medDetails.altIds[index],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            medDetails.altNames[index],
-                                            style: TextStyle(fontSize: 16),
-                                          ),
-                                          Icon(Icons.arrow_forward_ios,
-                                              size: 16),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
                     ],
                   ),
                 ),
@@ -342,8 +287,6 @@ class MedDetails {
   String country;
   String manufacturer;
   String form;
-  List<int> altIds;
-  List<String> altNames;
 
   MedDetails({
     required this.medId,
@@ -359,8 +302,6 @@ class MedDetails {
     required this.country,
     required this.manufacturer,
     required this.form,
-    required this.altIds,
-    required this.altNames,
   });
 
   factory MedDetails.fromJson(Map<String, dynamic> json) {
@@ -378,8 +319,6 @@ class MedDetails {
       country: json["country"],
       manufacturer: json["manufacturer"],
       form: json["Form"],
-      altIds: List<int>.from(json["alt_ids"]),
-      altNames: List<String>.from(json["alt_names"]),
     );
   }
 }
