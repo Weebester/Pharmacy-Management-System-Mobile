@@ -60,6 +60,7 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final userState = Provider.of<UserState>(context);
+    final apiCaller = Provider.of<APICaller>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -103,7 +104,7 @@ class HomePageState extends State<HomePage> {
             ListTile(
               leading: Icon(Icons.key),
               title: Text('Change Password'),
-              onTap: () async {
+              onTap: () {
                 // Show the AlertDialog to change the password
                 showDialog(
                   context: context,
@@ -220,7 +221,68 @@ class HomePageState extends State<HomePage> {
               leading: Icon(Icons.message_outlined),
               title: Text('Submit a Ticket'),
               onTap: () {
-                // Ticket action
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    TextEditingController message = TextEditingController();
+                    return AlertDialog(
+                      title: Text('Submit a Ticket'),
+                      content: TextField(
+                        controller: message,
+                        decoration: InputDecoration(
+                          labelText: 'Message',
+                          hintText: 'Describe your issue',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                        ),
+                        maxLines: 5,
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Cancel
+                          },
+                          child: Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            String route =
+                                "$serverAddress/newticket"; // Endpoint for inserting item
+                            Map<String, dynamic> requestBody = {
+                              "Content": message.text,
+                              "PharmaIndex": userState.pharmaIndex
+                            };
+                            try {
+                              await apiCaller.post(route, requestBody);
+
+                              SchedulerBinding.instance
+                                  .addPostFrameCallback((_) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          "Ticket submitted successfully!")),
+                                );
+                                Navigator.of(context).pop();
+                              });
+                            } catch (e) {
+                              SchedulerBinding.instance
+                                  .addPostFrameCallback((_) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          "Error: failed to submit a ticket")),
+                                );
+                                Navigator.of(context).pop();
+                              });
+                            }
+                          },
+                          child: Text('Submit'),
+                        ),
+                      ],
+                    );
+                  },
+                );
               },
             ),
             if (userState.decodeToken()["Manager"] == "Yes")

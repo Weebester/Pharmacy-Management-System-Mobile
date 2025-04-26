@@ -127,9 +127,9 @@ class MedDetailsPage extends StatelessWidget {
                         width: double.infinity,
                         padding: EdgeInsets.symmetric(horizontal: 10),
                         child: ElevatedButton(
-                          onPressed: () async {
+                          onPressed: () {
                             String price = "";
-                            await showDialog(
+                            showDialog(
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
@@ -204,11 +204,83 @@ class MedDetailsPage extends StatelessWidget {
                         ),
                       ),
                       Divider(),
-                      Text(
-                        "Basic Details",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
+                      Row(
+                        children: [Text(
+                          "Basic Details",
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                          IconButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  TextEditingController message = TextEditingController();
+                                  return AlertDialog(
+                                    title: Text('Submit a Ticket'),
+                                    content: TextField(
+                                      controller: message,
+                                      decoration: InputDecoration(
+                                        labelText: 'Message',
+                                        hintText: 'Describe your issue',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                                        ),
+                                      ),
+                                      maxLines: 5,
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Cancel
+                                        },
+                                        child: Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async {
+                                          String route =
+                                              "$serverAddress/newticket"; // Endpoint for inserting item
+                                          Map<String, dynamic> requestBody = {
+                                            "Content": message.text,
+                                            "PharmaIndex": userState.pharmaIndex,
+                                            "MedID": medId
+                                          };
+                                          try {
+                                            await apiCaller.post(route, requestBody);
+
+                                            SchedulerBinding.instance
+                                                .addPostFrameCallback((_) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                    content: Text(
+                                                        "Ticket submitted successfully!")),
+                                              );
+                                              Navigator.of(context).pop();
+                                            });
+                                          } catch (e) {
+                                            SchedulerBinding.instance
+                                                .addPostFrameCallback((_) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                    content: Text(
+                                                        "Error: failed to submit a ticket")),
+                                              );
+                                              Navigator.of(context).pop();
+                                            });
+                                          }
+                                        },
+                                        child: Text('Submit'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            icon: Icon(Icons.bug_report_outlined,color: Theme.of(context).colorScheme.primary,),
+                          )
+                        ],
+                      )
+                      ,
                       SizedBox(height: 8),
                       Text("ID: ${medDetails.medId}",
                           style: TextStyle(fontWeight: FontWeight.bold)),
