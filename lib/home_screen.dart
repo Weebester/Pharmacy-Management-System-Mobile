@@ -248,9 +248,10 @@ class HomePageState extends State<HomePage> {
                         TextButton(
                           onPressed: () async {
                             String route =
-                                "$serverAddress/newticket"; // Endpoint for inserting item
+                                "$serverAddress/newTicket"; // Endpoint for inserting item
                             Map<String, dynamic> requestBody = {
                               "Content": message.text,
+                              "UserUid":userState.getUserFBID(),
                               "PharmaIndex": userState.pharmaIndex
                             };
                             try {

@@ -27,6 +27,10 @@ class UserState with ChangeNotifier {
 
   int get pharmaIndex => _pharmaIndex;
 
+  String getUserFBID(){
+    return FirebaseAuth.instance.currentUser?.uid ?? "";
+  }
+
   // FastLogin from secure Storage
   Future<void> initializeUser() async {
     _accessToken = await _storage.read(key: 'accessToken') ?? '';
