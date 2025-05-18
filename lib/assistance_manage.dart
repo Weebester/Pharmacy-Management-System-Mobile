@@ -20,6 +20,8 @@ class AssistantManageState extends State<AssistantManage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   int _selectedBranchIndex = 0;
+  bool _obscurePassword = true;
+
 
   List<Assistant> _assistants = [];
 
@@ -168,17 +170,30 @@ class AssistantManageState extends State<AssistantManage> {
                   const SizedBox(height: 30),
                   TextFormField(
                     controller: _passwordController,
-                    obscureText: true,
+                    obscureText: _obscurePassword,
                     decoration: InputDecoration(
                       labelText: 'Password',
                       hintText: 'Enter your password',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
                     ),
-                    validator: (value) => value == null || value.isEmpty
-                        ? 'Please enter your password'
-                        : null,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 30),
                   TextFormField(

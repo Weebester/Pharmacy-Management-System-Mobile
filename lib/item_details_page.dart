@@ -306,6 +306,8 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   Text("POM: ${item.pom}",
                       style: TextStyle(fontWeight: FontWeight.bold)),
+                  if (item.obsolete == "Yes") Text("This Medicine is Obsolete \u26A0\uFE0F",
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   Row(
                     children: [
                       Text(

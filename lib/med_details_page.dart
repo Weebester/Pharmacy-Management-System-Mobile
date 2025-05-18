@@ -295,6 +295,8 @@ class MedDetailsPage extends StatelessWidget {
                           style: TextStyle(fontWeight: FontWeight.bold)),
                       Text("Dosage Form: ${medDetails.form}",
                           style: TextStyle(fontWeight: FontWeight.bold)),
+                      if (medDetails.obsolete == "Yes") Text("This Medicine is Obsolete \u26A0\uFE0F",
+                style: TextStyle(fontWeight: FontWeight.bold)),
                       SizedBox(height: 16),
                       Divider(),
                       Text(
@@ -360,6 +362,7 @@ class MedDetails {
   String country;
   String manufacturer;
   String form;
+  String obsolete;
 
   MedDetails({
     required this.medId,
@@ -375,6 +378,7 @@ class MedDetails {
     required this.country,
     required this.manufacturer,
     required this.form,
+    required this.obsolete
   });
 
   factory MedDetails.fromJson(Map<String, dynamic> json) {
@@ -392,6 +396,7 @@ class MedDetails {
       country: json["country"],
       manufacturer: json["manufacturer"],
       form: json["Form"],
+      obsolete: json["Obsolete"],
     );
   }
 }

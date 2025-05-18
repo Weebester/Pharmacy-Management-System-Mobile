@@ -105,115 +105,11 @@ class HomePageState extends State<HomePage> {
               leading: Icon(Icons.key),
               title: Text('Change Password'),
               onTap: () {
-                // Show the AlertDialog to change the password
                 showDialog(
                   context: context,
-                  builder: (BuildContext context) {
-                    TextEditingController oldPasswordController =
-                        TextEditingController();
-                    TextEditingController newPasswordController =
-                        TextEditingController();
-                    TextEditingController confirmPasswordController =
-                        TextEditingController();
-
-                    return AlertDialog(
-                      title: Text("Change Password"),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextField(
-                            controller: oldPasswordController,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              labelText: 'Old Password',
-                              hintText: 'Enter your old password',
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 15),
-                          TextField(
-                            controller: newPasswordController,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              labelText: 'New Password',
-                              hintText: 'Enter a new password',
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 15),
-                          TextField(
-                            controller: confirmPasswordController,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              labelText: 'Confirm New Password',
-                              hintText: 'Confirm your new password',
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () {
-                            // Close the dialog
-                            Navigator.of(context).pop();
-                          },
-                          child: Text("Cancel"),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            String oldPassword = oldPasswordController.text;
-                            String newPassword = newPasswordController.text;
-                            String confirmPassword =
-                                confirmPasswordController.text;
-
-                            if (newPassword != confirmPassword) {
-                              // Show error if new passwords don't match
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content: Text("New passwords don't match")),
-                              );
-                              return;
-                            }
-
-                            try {
-                              await userState.changePassword(
-                                  oldPassword, newPassword);
-
-                              SchedulerBinding.instance
-                                  .addPostFrameCallback((_) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text(
-                                          "Password changed successfully!")),
-                                );
-                                Navigator.of(context).pop();
-                              });
-                            } catch (e) {
-                              SchedulerBinding.instance
-                                  .addPostFrameCallback((_) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text("Error: ${e.toString()}")),
-                                );
-                                Navigator.of(context).pop();
-                              });
-                            }
-                          },
-                          child: Text("Change Password"),
-                        ),
-                      ],
-                    );
-                  },
+                  builder: (context) => ChangePasswordDialog(
+                    onSubmit: (oldPass, newPass) => userState.changePassword(oldPass, newPass),
+                  ),
                 );
               },
             ),
@@ -381,3 +277,103 @@ class HomePageState extends State<HomePage> {
     );
   }
 }
+
+
+class ChangePasswordDialog extends StatefulWidget {
+  final Future<void> Function(String oldPassword, String newPassword) onSubmit;
+
+  const ChangePasswordDialog({super.key, required this.onSubmit});
+
+  @override
+  ChangePasswordDialogState createState() => ChangePasswordDialogState();
+}
+
+class ChangePasswordDialogState extends State<ChangePasswordDialog> {
+  final TextEditingController oldPasswordController = TextEditingController();
+  final TextEditingController newPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
+
+  bool obscureOld = true;
+  bool obscureNew = true;
+  bool obscureConfirm = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text("Change Password"),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildPasswordField("Old Password", oldPasswordController, obscureOld, () {
+            setState(() => obscureOld = !obscureOld);
+          }),
+          SizedBox(height: 15),
+          _buildPasswordField("New Password", newPasswordController, obscureNew, () {
+            setState(() => obscureNew = !obscureNew);
+          }),
+          SizedBox(height: 15),
+          _buildPasswordField("Confirm New Password", confirmPasswordController, obscureConfirm, () {
+            setState(() => obscureConfirm = !obscureConfirm);
+          }),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text("Cancel"),
+        ),
+        TextButton(
+          onPressed: () async {
+            String oldPassword = oldPasswordController.text;
+            String newPassword = newPasswordController.text;
+            String confirmPassword = confirmPasswordController.text;
+
+            if (newPassword != confirmPassword) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("New passwords don't match")),
+              );
+              return;
+            }
+
+            try {
+              await widget.onSubmit(oldPassword, newPassword);
+              SchedulerBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Password changed successfully!")),
+                );
+                Navigator.of(context).pop();
+              });
+            } catch (e) {
+              SchedulerBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Error: ${e.toString()}")),
+                );
+                Navigator.of(context).pop();
+              });
+            }
+          },
+          child: Text("Change Password"),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPasswordField(String label, TextEditingController controller, bool obscure, VoidCallback toggle) {
+    return TextField(
+      controller: controller,
+      obscureText: obscure,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: 'Enter $label'.toLowerCase(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
+          onPressed: toggle,
+        ),
+      ),
+    );
+  }
+}
+

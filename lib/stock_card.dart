@@ -142,6 +142,7 @@ class StockItem {
   String country;
   String pom;
   int price;
+  String obsolete;
   List<Map<String, dynamic>> batches;
 
   StockItem({
@@ -153,6 +154,7 @@ class StockItem {
     required this.pom,
     required this.price,
     required this.batches,
+    required this.obsolete
   });
 
   factory StockItem.fromJson(Map<String, dynamic> json) {
@@ -164,6 +166,7 @@ class StockItem {
         country: json["Country"],
         pom: json["Pom"],
         price: json["Price"],
+        obsolete: json["Obsolete"],
         batches: List<Map<String, dynamic>>.from(
             json["batches"])
         );
