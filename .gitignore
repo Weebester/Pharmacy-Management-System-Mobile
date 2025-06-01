@@ -44,6 +44,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-mypharmacy/firebase.json
-mypharmacy/ios
+firebase.json
+ios/
 
